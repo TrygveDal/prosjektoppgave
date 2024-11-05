@@ -38,13 +38,15 @@ export class ArticleList extends Component {
     this.connection = new WebSocket('ws://localhost:3000/api/v1/wiki');
 
     this.connection.onmessage = (message) => {
-      this.articles = message.data;
+      console.log(JSON.parse(message.data));
+      this.articles = JSON.parse(message.data);
+      this.forceUpdate();
     };
 
     // Called when the connection is ready
     this.connection.onopen = () => {
       this.connected = true;
-      this.connection?.send('viewing articlelist');
+      this.connection?.send('view_articlelist');
     };
 
     // Called if connection is closed
