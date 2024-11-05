@@ -31,10 +31,11 @@ export default class WhiteboardServer {
               'SELECT author, title, content, `edit`, Articles.pageId FROM Articles, Versions WHERE Articles.pageId = Versions.pageId AND latest = 1',
               (error, results: RowDataPacket[]) => {
                 if (error) return reject(error);
-
+                /*
                 for (let i = 0; i < results.length; i++) {
                   results[i][3] = results[i][3].toDateString;
                 }
+                  */
                 resolve(results as Article[]);
               },
             );

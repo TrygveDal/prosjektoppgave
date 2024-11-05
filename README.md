@@ -2,6 +2,24 @@
 
 ## Setup database connections
 
+`server/config.ts`:
+
+```ts
+process.env.MYSQL_HOST = 'mysql.stud.ntnu.no';
+process.env.MYSQL_USER = 'username_todo';
+process.env.MYSQL_PASSWORD = 'username_todo';
+process.env.MYSQL_DATABASE = 'username_todo_dev';
+```
+
+`server/test/config.ts`:
+
+```ts
+process.env.MYSQL_HOST = 'mysql.stud.ntnu.no';
+process.env.MYSQL_USER = 'username_todo';
+process.env.MYSQL_PASSWORD = 'username_todo';
+process.env.MYSQL_DATABASE = 'username_todo_test';
+```
+
 edit er returverdi av Date.now(), altså millisekunder etter 1. januar 1970
 
 ```sql
