@@ -6,7 +6,7 @@ type Article = {
   author: string;
   title: string;
   content: string;
-  edit_date: string;
+  edit_date: number;
   pageId: number;
 };
 

@@ -8,7 +8,7 @@ type Article = {
   author: string;
   title: string;
   content: string;
-  edit_date: string;
+  edit_date: number;
   pageId: number;
 };
 
@@ -21,15 +21,13 @@ export class ArticleList extends Component {
     return (
       <>
         <Card title="Articles">
-          {this.articles.map((article) => (
+          {this.articles.map((article) => {
             <Row key={article.pageId}>
-              <Column>
-                <NavLink to={'/articles/' + article.pageId}>{article.title}</NavLink>
-              </Column>
+              <Column>{article.title}</Column>
               <Column>{article.author}</Column>
               <Column>{article.edit_date}</Column>
-            </Row>
-          ))}
+            </Row>;
+          })}
         </Card>
       </>
     );
@@ -37,10 +35,10 @@ export class ArticleList extends Component {
 
   mounted() {
     // Connect to the websocket server
-    this.connection = new WebSocket('ws://localhost:3000/api/v1/whiteboard');
+    this.connection = new WebSocket('ws://localhost:3000/api/v1/wiki');
 
     this.connection.onmessage = (message) => {
-      this.articles = JSON.parse(message.data);
+      this.articles = message.data;
     };
 
     // Called when the connection is ready
