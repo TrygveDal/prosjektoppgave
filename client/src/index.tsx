@@ -1,13 +1,20 @@
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
-import { Whiteboard } from './whiteboard-component';
-import { Alert } from './widgets';
+import { ArticleList } from './whiteboard-component';
+import { Alert, Card, Row, Column } from './widgets';
 
 let root = document.getElementById('root');
 if (root)
   createRoot(root).render(
     <>
       <Alert />
-      <Whiteboard />
+      <Card title="Wiki-side">
+        <Row>
+          <Column>Articles</Column>
+          <Column>Tags</Column>
+          <Column>About</Column>
+        </Row>
+        <ArticleList />
+      </Card>
     </>,
   );

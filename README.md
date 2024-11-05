@@ -2,10 +2,25 @@
 
 ## Setup database connections
 
-This example does not use any database. You can therefore create empty `config.ts` files:
+edit er returverdi av Date.now(), altså millisekunder etter 1. januar 1970
 
-```sh
-touch server/config.ts server/test/config.ts
+```sql
+CREATE TABLE `Versions` (
+  `pageId` INT NOT NULL ,
+  `content` TEXT ,
+  `title` TEXT NOT NULL ,
+  `type` TEXT NOT NULL,
+  `versionnr` INT NOT NULL ,
+  `author` TEXT NOT NULL,
+  `edit` INT NOT NULL,
+  `latest` BOOL NOT NULL
+);
+
+CREATE TABLE `Articles` (
+  `pageId` INT NOT NULL AUTO_INCREMENT ,
+  `views` INT NOT NULL ,
+  PRIMARY KEY (`pageId`)
+);
 ```
 
 ## Start server

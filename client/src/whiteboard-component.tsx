@@ -1,33 +1,36 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import { Alert } from './widgets';
+import { Alert, Card, Row, Column } from './widgets';
+import { NavLink } from 'react-router-dom';
+import wikiService from './wiki-service';
 
-type Message = { line: { from: { x: number; y: number }; to: { x: number; y: number } } };
+type Article = {
+  author: string;
+  title: string;
+  content: string;
+  edit_date: string;
+  pageId: number;
+};
 
-export class Whiteboard extends Component {
-  canvas: HTMLCanvasElement | null = null;
-  lastPos: { x: number; y: number } | null = null;
+export class ArticleList extends Component {
+  articles: Article[] = [];
   connection: WebSocket | null = null;
   connected = false;
 
   render() {
     return (
       <>
-        <canvas
-          ref={(e) => (this.canvas = e) /* Store canvas element */}
-          onMouseMove={(event) => {
-            // Send lines to Whiteboard server
-            const pos = { x: event.clientX, y: event.clientY };
-            if (this.lastPos && this.connected) {
-              this.connection?.send(JSON.stringify({ line: { from: this.lastPos, to: pos } }));
-            }
-            this.lastPos = pos;
-          }}
-          width={400}
-          height={400}
-          style={{ border: '2px solid black' }}
-        />
-        <div>{this.connected ? 'Connected' : 'Not connected'}</div>
+        <Card title="Articles">
+          {this.articles.map((article) => (
+            <Row key={article.pageId}>
+              <Column>
+                <NavLink to={'/articles/' + article.pageId}>{article.title}</NavLink>
+              </Column>
+              <Column>{article.author}</Column>
+              <Column>{article.edit_date}</Column>
+            </Row>
+          ))}
+        </Card>
       </>
     );
   }
@@ -36,20 +39,14 @@ export class Whiteboard extends Component {
     // Connect to the websocket server
     this.connection = new WebSocket('ws://localhost:3000/api/v1/whiteboard');
 
+    this.connection.onmessage = (message) => {
+      this.articles = JSON.parse(message.data);
+    };
+
     // Called when the connection is ready
     this.connection.onopen = () => {
       this.connected = true;
-    };
-
-    // Called on incoming message
-    this.connection.onmessage = (message) => {
-      const context = this.canvas?.getContext('2d');
-      context?.beginPath();
-      const data: Message = JSON.parse(message.data);
-      context?.moveTo(data.line.from.x, data.line.from.y);
-      context?.lineTo(data.line.to.x, data.line.to.y);
-      context?.closePath();
-      context?.stroke();
+      this.connection?.send('viewing articlelist');
     };
 
     // Called if connection is closed
@@ -63,9 +60,8 @@ export class Whiteboard extends Component {
       this.connected = false;
       Alert.danger('Connection error');
     };
+    // Close websocket connection when component is no longer in use
   }
-
-  // Close websocket connection when component is no longer in use
   beforeUnmount() {
     this.connection?.close();
   }
