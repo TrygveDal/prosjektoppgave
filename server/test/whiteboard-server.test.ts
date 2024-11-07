@@ -1,6 +1,6 @@
 import http from 'http';
 import WebSocket from 'ws';
-import WhiteboardServer from '../src/whiteboard-server';
+import WhiteboardServer from '../src/wiki-server';
 
 let webServer: any;
 beforeAll((done) => {

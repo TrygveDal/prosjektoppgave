@@ -14,8 +14,6 @@ type Article = {
 
 export class ArticleList extends Component {
   articles: Article[] = [];
-  connection: WebSocket | null = null;
-  connected = false;
 
   render() {
     return (
@@ -34,33 +32,9 @@ export class ArticleList extends Component {
   }
 
   mounted() {
-    // Connect to the websocket server
-    this.connection = new WebSocket('ws://localhost:3000/api/v1/wiki');
-
-    this.connection.onmessage = (message) => {
-      this.articles = message.data;
-    };
-
-    // Called when the connection is ready
-    this.connection.onopen = () => {
-      this.connected = true;
-      this.connection?.send('viewing articlelist');
-    };
-
-    // Called if connection is closed
-    this.connection.onclose = (event) => {
-      this.connected = false;
-      Alert.danger('Connection closed with code ' + event.code + ' and reason: ' + event.reason);
-    };
-
-    // Called on connection error
-    this.connection.onerror = () => {
-      this.connected = false;
-      Alert.danger('Connection error');
-    };
-    // Close websocket connection when component is no longer in use
-  }
-  beforeUnmount() {
-    this.connection?.close();
+    wikiService.getArticles().then((articles) => {
+      this.articles = articles;
+      console.log(articles);
+    });
   }
 }

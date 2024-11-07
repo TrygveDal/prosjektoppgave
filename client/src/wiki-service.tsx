@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://localhost:3000/api/v2';
+axios.defaults.baseURL = 'http://localhost:3000/api/v1';
 
 type Article = {
   author: string;
@@ -14,7 +14,7 @@ class WikiService {
   /**
    * Get all articles.
    */
-  getAllArticles() {
+  getArticles() {
     return axios.get<Article[]>('/articles').then((response) => response.data);
   }
 }
