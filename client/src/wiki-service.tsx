@@ -17,6 +17,14 @@ class WikiService {
   getArticles() {
     return axios.get<Article[]>('/articles').then((response) => response.data);
   }
+
+  // Create new articles and update existing ones
+  createArticle(article: Article) {
+    article.edit = Date.now();
+    return axios
+      .post<{ id: number }>('/articles', { article })
+      .then((response) => response.data.id);
+  }
 }
 
 const wikiService = new WikiService();

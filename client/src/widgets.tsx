@@ -56,7 +56,7 @@ export class NavPageHeader extends Component {
                 </form>
               </li>
               <li className="nav-item hyperlinks">
-                <a className="nav-link nav-custom-button" aria-current="page" href="#">
+                <a className="nav-link nav-custom-button" aria-current="page" href="/articles/new">
                   Create New Page
                 </a>
               </li>
