@@ -8,7 +8,7 @@ type Article = {
   author: string;
   title: string;
   content: string;
-  edit_date: number;
+  edit: number;
   pageId: number;
 };
 
@@ -19,22 +19,30 @@ export class ArticleList extends Component {
     return (
       <>
         <Card title="Articles">
-          {this.articles.map((article) => {
+          <Row>
+            <Column>Article</Column>
+            <Column>Last edited by</Column>
+            <Column>Last edit at</Column>
+          </Row>
+          {this.articles.map((article) => (
             <Row key={article.pageId}>
               <Column>{article.title}</Column>
               <Column>{article.author}</Column>
-              <Column>{article.edit_date}</Column>
-            </Row>;
-          })}
+              <Column>{new Date(article.edit).toUTCString()}</Column>
+            </Row>
+          ))}
         </Card>
       </>
     );
   }
 
   mounted() {
-    wikiService.getArticles().then((articles) => {
-      this.articles = articles;
-      console.log(articles);
-    });
+    wikiService
+      .getArticles()
+      .then((articles) => {
+        this.articles = articles;
+        console.log(articles);
+      })
+      .catch((error) => Alert.danger('Error getting articles: ' + error.message));
   }
 }
