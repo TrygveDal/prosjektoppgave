@@ -1,72 +1,99 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import { Alert } from './widgets';
+import { Alert, Card, Row, Column, Button, Form } from './widgets';
+import { NavLink } from 'react-router-dom';
+import wikiService from './wiki-service';
+import { createHashHistory } from 'history';
 
-type Message = { line: { from: { x: number; y: number }; to: { x: number; y: number } } };
+const history = createHashHistory(); // Use history.push(...) to programmatically change path, for instance after successfully saving a student
 
-export class Whiteboard extends Component {
-  canvas: HTMLCanvasElement | null = null;
-  lastPos: { x: number; y: number } | null = null;
-  connection: WebSocket | null = null;
-  connected = false;
+type Article = {
+  author: string;
+  title: string;
+  content: string;
+  edit: number;
+  pageId: number;
+};
+
+export class ArticleList extends Component {
+  articles: Article[] = [];
 
   render() {
     return (
       <>
-        <canvas
-          ref={(e) => (this.canvas = e) /* Store canvas element */}
-          onMouseMove={(event) => {
-            // Send lines to Whiteboard server
-            const pos = { x: event.clientX, y: event.clientY };
-            if (this.lastPos && this.connected) {
-              this.connection?.send(JSON.stringify({ line: { from: this.lastPos, to: pos } }));
-            }
-            this.lastPos = pos;
-          }}
-          width={400}
-          height={400}
-          style={{ border: '2px solid black' }}
-        />
-        <div>{this.connected ? 'Connected' : 'Not connected'}</div>
+        <Card title="Articles">
+          <Row>
+            <Column>Article</Column>
+            <Column>Last edited by</Column>
+            <Column>Last edit at</Column>
+          </Row>
+          {this.articles.map((article) => (
+            <Row key={article.pageId}>
+              <Column>{article.title}</Column>
+              <Column>{article.author}</Column>
+              <Column>{new Date(article.edit).toUTCString()}</Column>
+            </Row>
+          ))}
+        </Card>
       </>
     );
   }
 
   mounted() {
-    // Connect to the websocket server
-    this.connection = new WebSocket('ws://localhost:3000/api/v1/whiteboard');
-
-    // Called when the connection is ready
-    this.connection.onopen = () => {
-      this.connected = true;
-    };
-
-    // Called on incoming message
-    this.connection.onmessage = (message) => {
-      const context = this.canvas?.getContext('2d');
-      context?.beginPath();
-      const data: Message = JSON.parse(message.data);
-      context?.moveTo(data.line.from.x, data.line.from.y);
-      context?.lineTo(data.line.to.x, data.line.to.y);
-      context?.closePath();
-      context?.stroke();
-    };
-
-    // Called if connection is closed
-    this.connection.onclose = (event) => {
-      this.connected = false;
-      Alert.danger('Connection closed with code ' + event.code + ' and reason: ' + event.reason);
-    };
-
-    // Called on connection error
-    this.connection.onerror = () => {
-      this.connected = false;
-      Alert.danger('Connection error');
-    };
+    wikiService
+      .getArticles()
+      .then((articles) => {
+        this.articles = articles;
+      })
+      .catch((error) => Alert.danger('Error getting articles: ' + error.message));
   }
+}
 
-  // Close websocket connection when component is no longer in use
-  beforeUnmount() {
-    this.connection?.close();
+export class ArticleCreate extends Component {
+  article: Article = { author: '', title: '', content: '', edit: 0, pageId: 0 };
+
+  render() {
+    return (
+      <>
+        <Card title="New article">
+          <Row>
+            <Column width={2}>
+              <Form.Label>Title:</Form.Label>
+            </Column>
+            <Column>
+              <Form.Input
+                type="text"
+                value={this.article.title}
+                onChange={(event) => (this.article.title = event.currentTarget.value)}
+              />
+            </Column>
+          </Row>
+          <Row>
+            <Column width={2}>
+              <Form.Label>Content:</Form.Label>
+            </Column>
+            <Column>
+              <Form.Textarea
+                value={this.article.content}
+                onChange={(e) => {
+                  this.article.content = e.currentTarget.value;
+                }}
+                rows={10}
+              />
+            </Column>
+          </Row>
+        </Card>
+        <Button.Success
+          onClick={() => {
+            wikiService
+              .createArticle(this.article)
+              .then((id) => history.push('/articles/' + id))
+              .catch((error) => Alert.danger('Error creating article: ' + error.message));
+          }}
+        >
+          Create
+        </Button.Success>
+      </>
+    );
   }
 }

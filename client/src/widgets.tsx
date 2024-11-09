@@ -2,6 +2,7 @@ import * as React from 'react';
 import { ReactNode, ChangeEvent } from 'react';
 import { Component } from 'react-simplified';
 import { NavLink } from 'react-router-dom';
+import './css-folder/index.css';
 
 /**
  * Renders an information card using Bootstrap classes.
@@ -17,6 +18,62 @@ export class Card extends Component<{ title: ReactNode }> {
           <div className="card-text">{this.props.children}</div>
         </div>
       </div>
+    );
+  }
+}
+
+export class NavPageHeader extends Component {
+  render() {
+    return (
+      <nav className="navbar navbar-expand-lg bg-body-tertiary navbar-light">
+        <div className="container-fluid">
+          <a className="navbar-brand" href="" style={{ width: '', height: '' }}>
+            <img src={'../assets/pictures/logo.png'} />
+          </a>
+          <button
+            className="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarNav"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+
+          <div className="collapse navbar-collapse">
+            <ul className="navbar-nav">
+              <li className="nav-item searchbox">
+                <form className="d-flex nav-link" role="search">
+                  <input
+                    className="form-control me-2 search-input"
+                    type="search"
+                    placeholder="Search"
+                    aria-label="Search"
+                  />
+                  <button className="btn btn-outline-success search-btn" type="submit">
+                    Search
+                  </button>
+                </form>
+              </li>
+              <li className="nav-item hyperlinks">
+                <a className="nav-link nav-custom-button" aria-current="page" href="/articles/new">
+                  Create New Page
+                </a>
+              </li>
+              <li className="nav-item hyperlinks">
+                <a className="nav-link nav-custom-button" aria-current="page" href="#">
+                  Tags
+                </a>
+              </li>
+              <li className="nav-item hyperlinks">
+                <a className="nav-link nav-custom-button" aria-current="page" href="#">
+                  Login
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
     );
   }
 }

@@ -1,13 +1,17 @@
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
-import { Whiteboard } from './whiteboard-component';
-import { Alert } from './widgets';
+import { HashRouter, Route } from 'react-router-dom';
+import { ArticleList, ArticleCreate } from './whiteboard-component';
+import { Alert, NavPageHeader } from './widgets';
 
 let root = document.getElementById('root');
 if (root)
   createRoot(root).render(
-    <>
-      <Alert />
-      <Whiteboard />
-    </>,
+    <HashRouter>
+      <>
+        <Alert />
+        <NavPageHeader />
+        <ArticleList />
+      </>
+    </HashRouter>,
   );
