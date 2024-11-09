@@ -11,8 +11,8 @@ if (root)
       <>
         <Alert />
         <NavPageHeader />
-        <ArticleList />
-        <ArticleCreate />
+        <Route exact path="/" component={ArticleList} />
+        <Route exact path="/articles/new" component={ArticleCreate} />
       </>
     </HashRouter>,
   );
