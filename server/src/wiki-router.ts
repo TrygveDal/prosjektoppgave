@@ -16,7 +16,7 @@ router.get('/articles', (_request, response) => {
 router.post('/articles', (request, response) => {
   const data = request.body;
   if (data.article && data.article.title && data.article.content && data.article.author)
-    if (data.article.pageId) {
+    if (data.article.pageId && data.article.pageId != 0) {
       wikiService
         .editArticle(data.article)
         .then((id) => response.send({ id: id }))

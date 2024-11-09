@@ -30,7 +30,7 @@ CREATE TABLE `Versions` (
   `type` TEXT NOT NULL,
   `versionnr` INT NOT NULL ,
   `author` TEXT NOT NULL,
-  `edit` INT NOT NULL,
+  `edit_time` BIGINT NOT NULL,
   `latest` BOOL NOT NULL
 );
 
