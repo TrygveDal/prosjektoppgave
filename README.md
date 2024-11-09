@@ -1,4 +1,4 @@
-# WebSocket example: Whiteboard
+# Wiki
 
 ## Setup database connections
 
