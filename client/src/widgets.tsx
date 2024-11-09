@@ -56,19 +56,19 @@ export class NavPageHeader extends Component {
                 </form>
               </li>
               <li className="nav-item hyperlinks">
-                <a className="nav-link nav-custom-button" aria-current="page" href="/articles/new">
-                  Create New Page
-                </a>
+                <div className="nav-link nav-custom-button" aria-current="page">
+                  <NavBar.Link to="/articles/new">Create new page</NavBar.Link>
+                </div>
               </li>
               <li className="nav-item hyperlinks">
-                <a className="nav-link nav-custom-button" aria-current="page" href="#">
-                  Tags
-                </a>
+                <div className="nav-link nav-custom-button" aria-current="page">
+                  <NavBar.Link to="/">Tags</NavBar.Link>
+                </div>
               </li>
               <li className="nav-item hyperlinks">
-                <a className="nav-link nav-custom-button" aria-current="page" href="#">
-                  Login
-                </a>
+                <div className="nav-link nav-custom-button" aria-current="page">
+                  <NavBar.Link to="/">Login</NavBar.Link>
+                </div>
               </li>
             </ul>
           </div>

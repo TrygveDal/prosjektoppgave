@@ -95,17 +95,7 @@ export class ArticleCreate extends Component {
           onClick={() => {
             wikiService
               .createArticle(this.article)
-              .then(() => {
-                this.article = {
-                  author: 'anon',
-                  title: '',
-                  content: '',
-                  edit_time: 0,
-                  pageId: 0,
-                  version: 0,
-                };
-              })
-              .then(() => ArticleList.instance()?.mounted())
+              .then(() => history.push('/'))
               .catch((error) => Alert.danger('Error creating article: ' + error.message));
           }}
         >
