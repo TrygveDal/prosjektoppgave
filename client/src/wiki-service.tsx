@@ -6,8 +6,9 @@ type Article = {
   author: string;
   title: string;
   content: string;
-  edit: number;
+  edit_time: number;
   pageId: number;
+  version: number;
 };
 
 class WikiService {
@@ -20,7 +21,7 @@ class WikiService {
 
   // Create new articles and update existing ones
   createArticle(article: Article) {
-    article.edit = Date.now();
+    article.edit_time = Date.now();
     return axios
       .post<{ id: number }>('/articles', { article })
       .then((response) => response.data.id);

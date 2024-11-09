@@ -8,7 +8,7 @@ type Article = {
   author: string;
   title: string;
   content: string;
-  edit_date: number;
+  edit_time: number;
   pageId: number;
 };
 

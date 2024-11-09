@@ -5,7 +5,7 @@ type Article = {
   author: string;
   title: string;
   content: string;
-  edit: number;
+  edit_time: number;
   pageId: number;
 };
 
@@ -13,7 +13,7 @@ class WikiService {
   getArticles() {
     return new Promise<Article[]>((resolve, reject) => {
       pool.query(
-        'SELECT author, title, content, `edit`, Articles.pageId FROM Articles, Versions WHERE Articles.pageId = Versions.pageId AND latest = 1',
+        'SELECT author, title, content, `edit_time`, Articles.pageId FROM Articles, Versions WHERE Articles.pageId = Versions.pageId AND latest = 1',
         (error, results: RowDataPacket[]) => {
           if (error) return reject(error);
 
@@ -37,8 +37,8 @@ class WikiService {
       articleId
         .then((id) => {
           pool.query(
-            'INSERT INTO `Versions` (`author`,`content`,`edit`,`latest`,`pageId`,`title`,`type`,`versionnr`) VALUES (?,?,?,1,?,?,"init",1)',
-            [article.author, article.content, article.edit, id, article.title],
+            'INSERT INTO `Versions` (`author`,`content`,`edit_time`,`latest`,`pageId`,`title`,`type`,`versionnr`) VALUES (?,?,?,1,?,?,"init",1)',
+            [article.author, article.content, article.edit_time, id, article.title],
             (error, results: ResultSetHeader) => {
               if (error) return reject(error);
 
@@ -58,7 +58,7 @@ class WikiService {
           (error, results: RowDataPacket[]) => {
             if (error) return reject(error);
 
-            resolve((results[0].versionnr + 1) as number);
+            resolve(results[0].versionnr as number);
           },
         );
       });
@@ -70,10 +70,10 @@ class WikiService {
               article.pageId,
               article.author,
               article.content,
-              article.edit,
+              article.edit_time,
               article.pageId,
               article.title,
-              version,
+              version + 1,
             ],
             (error, results: ResultSetHeader) => {
               if (error) return reject(error);

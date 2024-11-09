@@ -11,8 +11,9 @@ type Article = {
   author: string;
   title: string;
   content: string;
-  edit: number;
+  edit_time: number;
   pageId: number;
+  version: number;
 };
 
 export class ArticleList extends Component {
@@ -31,7 +32,7 @@ export class ArticleList extends Component {
             <Row key={article.pageId}>
               <Column>{article.title}</Column>
               <Column>{article.author}</Column>
-              <Column>{new Date(article.edit).toUTCString()}</Column>
+              <Column>{new Date(article.edit_time).toUTCString()}</Column>
             </Row>
           ))}
         </Card>
@@ -50,7 +51,14 @@ export class ArticleList extends Component {
 }
 
 export class ArticleCreate extends Component {
-  article: Article = { author: '', title: '', content: '', edit: 0, pageId: 0 };
+  article: Article = {
+    author: 'anon',
+    title: '',
+    content: '',
+    edit_time: 0,
+    pageId: 0,
+    version: 0,
+  };
 
   render() {
     return (
@@ -87,7 +95,17 @@ export class ArticleCreate extends Component {
           onClick={() => {
             wikiService
               .createArticle(this.article)
-              .then((id) => history.push('/articles/' + id))
+              .then(() => {
+                this.article = {
+                  author: 'anon',
+                  title: '',
+                  content: '',
+                  edit_time: 0,
+                  pageId: 0,
+                  version: 0,
+                };
+              })
+              .then(() => ArticleList.instance()?.mounted())
               .catch((error) => Alert.danger('Error creating article: ' + error.message));
           }}
         >

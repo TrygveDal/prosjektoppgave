@@ -12,6 +12,7 @@ if (root)
         <Alert />
         <NavPageHeader />
         <ArticleList />
+        <ArticleCreate />
       </>
     </HashRouter>,
   );
