@@ -37,6 +37,23 @@ CREATE TABLE `Articles` (
   `views` INT NOT NULL ,
   PRIMARY KEY (`id`)
 );
+
+CREATE TABLE `Tags` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `tag` TEXT NOT NULL ,
+  PRIMARY KEY (`id`)
+  );
+
+CREATE TABLE `Comments` (
+  `article_id` INT NOT NULL ,
+  `user` TEXT NOT NULL ,
+  `content` TEXT NOT NULL
+  );
+
+CREATE TABLE `Articles_Tags` (
+  `tag_id` INT NOT NULL ,
+  `article_id` INT NOT NULL
+  );
 ```
 
 ## Start server
