@@ -9,6 +9,13 @@ type Article = {
   pageId: number;
 };
 
+type Version = {
+  author: string;
+  edit_time: number;
+  versionnr: number;
+  type: string;
+};
+
 class WikiService {
   getArticles() {
     return new Promise<Article[]>((resolve, reject) => {
@@ -36,6 +43,20 @@ class WikiService {
     });
   }
 
+  getVersion(pageId: number, version: number) {
+    return new Promise<Article | undefined>((resolve, reject) => {
+      pool.query(
+        'SELECT author, title, content, `edit_time`, Articles.pageId FROM Articles, Versions WHERE Articles.pageId = Versions.pageId AND Articles.pageId = ? AND versionnr = ?',
+        [pageId, version],
+        (error, results: RowDataPacket[]) => {
+          if (error) return reject(error);
+
+          resolve(results[0] as Article);
+        },
+      );
+    });
+  }
+
   viewArticle(pageId: number) {
     return new Promise<void>((resolve, reject) => {
       pool.query(
@@ -45,6 +66,20 @@ class WikiService {
           if (error) return reject(error);
 
           resolve();
+        },
+      );
+    });
+  }
+
+  versionHistory(pageId: number) {
+    return new Promise<Version[]>((resolve, reject) => {
+      pool.query(
+        'SELECT author, edit_time, versionnr, type FROM Versions WHERE pageId = ?',
+        [pageId],
+        (error, results: RowDataPacket[]) => {
+          if (error) return reject(error);
+
+          resolve(results as Version[]);
         },
       );
     });

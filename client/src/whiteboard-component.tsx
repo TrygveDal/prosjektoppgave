@@ -16,7 +16,16 @@ type Article = {
   version: number;
 };
 
-export class ArticleDetails extends Component<{ match: { params: { pageId: number } } }> {
+type Version = {
+  author: string;
+  edit_time: number;
+  versionnr: number;
+  type: string;
+};
+
+export class ArticleDetails extends Component<{
+  match: { params: { pageId: number; versionnr?: number } };
+}> {
   article: Article = {
     author: 'anon',
     title: '',
@@ -30,7 +39,13 @@ export class ArticleDetails extends Component<{ match: { params: { pageId: numbe
     return (
       <>
         <Card title={this.article.title}>
-          <Row>Last edit by: {this.article.author}</Row>
+          {this.props.match.params.versionnr ? (
+            <Row>
+              <Column>Viewing version {this.props.match.params.versionnr}</Column>
+            </Row>
+          ) : (
+            <></>
+          )}
           <Row>
             <Card title="">{this.article.content}</Card>
           </Row>
@@ -40,16 +55,24 @@ export class ArticleDetails extends Component<{ match: { params: { pageId: numbe
         >
           Edit
         </Button.Success>
+        <VersionHistory pageId={this.props.match.params.pageId} />
       </>
     );
   }
 
   mounted() {
-    wikiService
-      .getArticle(this.props.match.params.pageId)
-      .then((article) => (this.article = article))
-      .then(() => wikiService.viewArticle(this.article.pageId))
-      .catch((error) => Alert.danger('Error getting article: ' + error.message));
+    if (this.props.match.params.versionnr) {
+      wikiService
+        .getVersion(this.props.match.params.pageId, this.props.match.params.versionnr)
+        .then((article) => (this.article = article))
+        .catch((error) => Alert.danger('Error getting article: ' + error.message));
+    } else {
+      wikiService
+        .getArticle(this.props.match.params.pageId)
+        .then((article) => (this.article = article))
+        .then(() => wikiService.viewArticle(this.article.pageId))
+        .catch((error) => Alert.danger('Error getting article: ' + error.message));
+    }
   }
 }
 
@@ -77,7 +100,7 @@ export class ArticleList extends Component {
               </Column>
 
               <Column>{article.author}</Column>
-              <Column>{new Date(article.edit_time).toUTCString()}</Column>
+              <Column>{new Date(article.edit_time).toLocaleString()}</Column>
             </Row>
           ))}
         </Card>
@@ -92,6 +115,45 @@ export class ArticleList extends Component {
         this.articles = articles;
       })
       .catch((error) => Alert.danger('Error getting articles: ' + error.message));
+  }
+}
+
+export class VersionHistory extends Component<{ pageId: number }> {
+  versions: Version[] = [];
+
+  render() {
+    return (
+      <>
+        <Card title="Version history:">
+          {this.versions.map((version) => (
+            <Row key={version.versionnr}>
+              <NavLink
+                to={'/articles/' + this.props.pageId + '/version/' + version.versionnr}
+                style={{ color: 'inherit', textDecoration: 'inherit' }}
+              >
+                {'type: ' +
+                  version.type +
+                  ' at: ' +
+                  new Date(version.edit_time).toLocaleString() +
+                  ' by: ' +
+                  version.author +
+                  ' version: ' +
+                  version.versionnr}
+              </NavLink>
+            </Row>
+          ))}
+        </Card>
+      </>
+    );
+  }
+
+  mounted() {
+    wikiService
+      .versionHistory(this.props.pageId)
+      .then((versions) => {
+        this.versions = versions;
+      })
+      .catch((error) => Alert.danger('Error getting versionhistory: ' + error.message));
   }
 }
 
@@ -200,7 +262,7 @@ export class ArticleEdit extends Component<{ match: { params: { pageId: number }
             this.article.author = user;
             wikiService
               .createArticle(this.article)
-              .then(() => history.push('/'))
+              .then((id) => history.push('/articles/' + id))
               .catch((error) => Alert.danger('Error creating article: ' + error.message));
           }}
         >

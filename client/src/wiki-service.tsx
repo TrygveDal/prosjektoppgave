@@ -11,6 +11,13 @@ type Article = {
   version: number;
 };
 
+type Version = {
+  author: string;
+  edit_time: number;
+  versionnr: number;
+  type: string;
+};
+
 class WikiService {
   /**
    * Get all articles.
@@ -23,8 +30,20 @@ class WikiService {
     return axios.get<Article>('/articles/' + pageId).then((response) => response.data);
   }
 
+  getVersion(pageId: number, version: number) {
+    return axios
+      .get<Article>('/articles/' + pageId + '/version/' + version)
+      .then((response) => response.data);
+  }
+
   viewArticle(pageId: number) {
     return axios.post<void>('/articles/' + pageId + '/viewed').then((response) => response.data);
+  }
+
+  versionHistory(pageId: number) {
+    return axios
+      .get<Version[]>('/articles/' + pageId + '/versionhistory')
+      .then((response) => response.data);
   }
 
   // Create new articles and update existing ones
