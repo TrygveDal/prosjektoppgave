@@ -29,7 +29,12 @@ export class ArticleDetails extends Component<{ match: { params: { pageId: numbe
   render() {
     return (
       <>
-        <Card title={this.article.title}>{this.article.content}</Card>
+        <Card title={this.article.title}>
+          <Row>Last edit by: {this.article.author}</Row>
+          <Row>
+            <Card title="">{this.article.content}</Card>
+          </Row>
+        </Card>
         <Button.Success
           onClick={() => history.push('/articles/' + this.props.match.params.pageId + '/edit')}
         >
@@ -43,6 +48,7 @@ export class ArticleDetails extends Component<{ match: { params: { pageId: numbe
     wikiService
       .getArticle(this.props.match.params.pageId)
       .then((article) => (this.article = article))
+      .then(() => wikiService.viewArticle(this.article.pageId))
       .catch((error) => Alert.danger('Error getting article: ' + error.message));
   }
 }

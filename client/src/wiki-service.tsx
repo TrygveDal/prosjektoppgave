@@ -23,6 +23,10 @@ class WikiService {
     return axios.get<Article>('/articles/' + pageId).then((response) => response.data);
   }
 
+  viewArticle(pageId: number) {
+    return axios.post<void>('/articles/' + pageId + '/viewed').then((response) => response.data);
+  }
+
   // Create new articles and update existing ones
   createArticle(article: Article) {
     article.edit_time = Date.now();

@@ -20,6 +20,14 @@ router.get('/articles/:pageId', (request, response) => {
     .catch((error) => response.status(500).send(error));
 });
 
+router.post('/articles/:pageId/viewed', (request, response) => {
+  const pageId = Number(request.params.pageId);
+  wikiService
+    .viewArticle(pageId)
+    .then(() => response.send())
+    .catch((error) => response.status(500).send(error));
+});
+
 router.post('/articles', (request, response) => {
   const data = request.body;
   if (data.article && data.article.title && data.article.content && data.article.author)

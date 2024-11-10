@@ -36,6 +36,20 @@ class WikiService {
     });
   }
 
+  viewArticle(pageId: number) {
+    return new Promise<void>((resolve, reject) => {
+      pool.query(
+        'UPDATE `Articles` SET `views` = `views`+1 WHERE `pageId` = ?',
+        [pageId],
+        (error, results) => {
+          if (error) return reject(error);
+
+          resolve();
+        },
+      );
+    });
+  }
+
   createArticle(article: Article) {
     return new Promise<number>((resolve, reject) => {
       const articleId = new Promise<number>((resolve, reject) => {
