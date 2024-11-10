@@ -10,7 +10,7 @@ type Article = {
   edit_time: number;
   version_number: number;
 };
-//version_type er enten "created", eller "edited"
+//version_type is eiter "created" or "edited"
 type Version = {
   author: string;
   edit_time: number;
