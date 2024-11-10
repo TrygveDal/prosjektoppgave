@@ -16,6 +16,37 @@ type Article = {
   version: number;
 };
 
+export class ArticleDetails extends Component<{ match: { params: { pageId: number } } }> {
+  article: Article = {
+    author: 'anon',
+    title: '',
+    content: '',
+    edit_time: 0,
+    pageId: 0,
+    version: 0,
+  };
+
+  render() {
+    return (
+      <>
+        <Card title={this.article.title}>{this.article.content}</Card>
+        <Button.Success
+          onClick={() => history.push('/articles/' + this.props.match.params.pageId + '/edit')}
+        >
+          Edit
+        </Button.Success>
+      </>
+    );
+  }
+
+  mounted() {
+    wikiService
+      .getArticle(this.props.match.params.pageId)
+      .then((article) => (this.article = article))
+      .catch((error) => Alert.danger('Error getting article: ' + error.message));
+  }
+}
+
 export class ArticleList extends Component {
   articles: Article[] = [];
 
@@ -30,7 +61,15 @@ export class ArticleList extends Component {
           </Row>
           {this.articles.map((article) => (
             <Row key={article.pageId}>
-              <Column>{article.title}</Column>
+              <Column>
+                <NavLink
+                  to={'/articles/' + article.pageId}
+                  style={{ color: 'inherit', textDecoration: 'inherit' }}
+                >
+                  {article.title}
+                </NavLink>
+              </Column>
+
               <Column>{article.author}</Column>
               <Column>{new Date(article.edit_time).toUTCString()}</Column>
             </Row>
@@ -93,6 +132,8 @@ export class ArticleCreate extends Component {
         </Card>
         <Button.Success
           onClick={() => {
+            const user = String(prompt('Username:'));
+            this.article.author = user;
             wikiService
               .createArticle(this.article)
               .then(() => history.push('/'))
@@ -103,5 +144,70 @@ export class ArticleCreate extends Component {
         </Button.Success>
       </>
     );
+  }
+}
+
+export class ArticleEdit extends Component<{ match: { params: { pageId: number } } }> {
+  article: Article = {
+    author: 'anon',
+    title: '',
+    content: '',
+    edit_time: 0,
+    pageId: 0,
+    version: 0,
+  };
+
+  render() {
+    return (
+      <>
+        <Card title="Edit article">
+          <Row>
+            <Column width={2}>
+              <Form.Label>Title:</Form.Label>
+            </Column>
+            <Column>
+              <Form.Input
+                type="text"
+                value={this.article.title}
+                onChange={(event) => (this.article.title = event.currentTarget.value)}
+              />
+            </Column>
+          </Row>
+          <Row>
+            <Column width={2}>
+              <Form.Label>Content:</Form.Label>
+            </Column>
+            <Column>
+              <Form.Textarea
+                value={this.article.content}
+                onChange={(e) => {
+                  this.article.content = e.currentTarget.value;
+                }}
+                rows={10}
+              />
+            </Column>
+          </Row>
+        </Card>
+        <Button.Success
+          onClick={() => {
+            const user = String(prompt('Username:'));
+            this.article.author = user;
+            wikiService
+              .createArticle(this.article)
+              .then(() => history.push('/'))
+              .catch((error) => Alert.danger('Error creating article: ' + error.message));
+          }}
+        >
+          Save
+        </Button.Success>
+      </>
+    );
+  }
+
+  mounted() {
+    wikiService
+      .getArticle(this.props.match.params.pageId)
+      .then((article) => (this.article = article))
+      .catch((error) => Alert.danger('Error getting article: ' + error.message));
   }
 }

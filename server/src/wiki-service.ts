@@ -22,6 +22,20 @@ class WikiService {
       );
     });
   }
+  getArticle(pageId: number) {
+    return new Promise<Article | undefined>((resolve, reject) => {
+      pool.query(
+        'SELECT author, title, content, `edit_time`, Articles.pageId FROM Articles, Versions WHERE Articles.pageId = Versions.pageId AND latest = 1 AND Articles.pageId = ?',
+        [pageId],
+        (error, results: RowDataPacket[]) => {
+          if (error) return reject(error);
+
+          resolve(results[0] as Article);
+        },
+      );
+    });
+  }
+
   createArticle(article: Article) {
     return new Promise<number>((resolve, reject) => {
       const articleId = new Promise<number>((resolve, reject) => {
@@ -65,9 +79,15 @@ class WikiService {
       version
         .then((version) => {
           pool.query(
-            'UPDATE `Versions` SET `latest`=0 WHERE `pageId` = ?;INSERT INTO `Versions` (`author`,`content`,`edit`,`latest`,`pageId`,`title`,`type`,`versionnr`) VALUES (?,?,?,1,?,?,"edit",?)',
+            'UPDATE `Versions` SET `latest`=0 WHERE `pageId` = ?',
+            [article.pageId],
+            (error, results: ResultSetHeader) => {
+              if (error) return reject(error);
+            },
+          );
+          pool.query(
+            'INSERT INTO `Versions` (`author`,`content`,`edit_time`,`latest`,`pageId`,`title`,`type`,`versionnr`) VALUES (?,?,?,1,?,?,"edit",?);',
             [
-              article.pageId,
               article.author,
               article.content,
               article.edit_time,
