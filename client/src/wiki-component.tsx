@@ -8,40 +8,40 @@ import { createHashHistory } from 'history';
 const history = createHashHistory(); // Use history.push(...) to programmatically change path, for instance after successfully saving a student
 
 type Article = {
-  author: string;
+  article_id: number;
   title: string;
   content: string;
+  author: string;
   edit_time: number;
-  pageId: number;
-  version: number;
+  version_number: number;
 };
-
+//version_type er enten "createt", eller "edited"
 type Version = {
   author: string;
   edit_time: number;
-  versionnr: number;
-  type: string;
+  version_number: number;
+  version_type: string;
 };
 
 export class ArticleDetails extends Component<{
-  match: { params: { pageId: number; versionnr?: number } };
+  match: { params: { article_id: number; version_number?: number } };
 }> {
   article: Article = {
-    author: 'anon',
+    article_id: 0,
     title: '',
     content: '',
+    author: 'anon',
     edit_time: 0,
-    pageId: 0,
-    version: 0,
+    version_number: 0,
   };
 
   render() {
     return (
       <>
         <Card title={this.article.title}>
-          {this.props.match.params.versionnr ? (
+          {this.props.match.params.version_number ? (
             <Row>
-              <Column>Viewing version {this.props.match.params.versionnr}</Column>
+              <Column>Viewing version {this.props.match.params.version_number}</Column>
             </Row>
           ) : (
             <></>
@@ -51,26 +51,26 @@ export class ArticleDetails extends Component<{
           </Row>
         </Card>
         <Button.Success
-          onClick={() => history.push('/articles/' + this.props.match.params.pageId + '/edit')}
+          onClick={() => history.push('/articles/' + this.props.match.params.article_id + '/edit')}
         >
           Edit
         </Button.Success>
-        <VersionHistory pageId={this.props.match.params.pageId} />
+        <VersionHistory article_id={this.props.match.params.article_id} />
       </>
     );
   }
 
   mounted() {
-    if (this.props.match.params.versionnr) {
+    if (this.props.match.params.version_number) {
       wikiService
-        .getVersion(this.props.match.params.pageId, this.props.match.params.versionnr)
+        .getVersion(this.props.match.params.article_id, this.props.match.params.version_number)
         .then((article) => (this.article = article))
         .catch((error) => Alert.danger('Error getting article: ' + error.message));
     } else {
       wikiService
-        .getArticle(this.props.match.params.pageId)
+        .getArticle(this.props.match.params.article_id)
         .then((article) => (this.article = article))
-        .then(() => wikiService.viewArticle(this.article.pageId))
+        .then(() => wikiService.viewArticle(this.article.article_id))
         .catch((error) => Alert.danger('Error getting article: ' + error.message));
     }
   }
@@ -88,11 +88,11 @@ export class ArticleList extends Component {
             <Column>Last edited by</Column>
             <Column>Last edit at</Column>
           </Row>
-          {this.articles.map((article) => (
-            <Row key={article.pageId}>
+          {this.articles.map((article, i) => (
+            <Row key={i}>
               <Column>
                 <NavLink
-                  to={'/articles/' + article.pageId}
+                  to={'/articles/' + article.article_id}
                   style={{ color: 'inherit', textDecoration: 'inherit' }}
                 >
                   {article.title}
@@ -118,7 +118,7 @@ export class ArticleList extends Component {
   }
 }
 
-export class VersionHistory extends Component<{ pageId: number }> {
+export class VersionHistory extends Component<{ article_id: number }> {
   versions: Version[] = [];
 
   render() {
@@ -126,19 +126,18 @@ export class VersionHistory extends Component<{ pageId: number }> {
       <>
         <Card title="Version history:">
           {this.versions.map((version) => (
-            <Row key={version.versionnr}>
+            <Row key={version.version_number}>
               <NavLink
-                to={'/articles/' + this.props.pageId + '/version/' + version.versionnr}
+                to={'/articles/' + this.props.article_id + '/version/' + version.version_number}
                 style={{ color: 'inherit', textDecoration: 'inherit' }}
               >
-                {'type: ' +
-                  version.type +
+                {version.version_type +
                   ' at: ' +
                   new Date(version.edit_time).toLocaleString() +
                   ' by: ' +
                   version.author +
                   ' version: ' +
-                  version.versionnr}
+                  version.version_number}
               </NavLink>
             </Row>
           ))}
@@ -149,7 +148,7 @@ export class VersionHistory extends Component<{ pageId: number }> {
 
   mounted() {
     wikiService
-      .versionHistory(this.props.pageId)
+      .versionHistory(this.props.article_id)
       .then((versions) => {
         this.versions = versions;
       })
@@ -159,12 +158,12 @@ export class VersionHistory extends Component<{ pageId: number }> {
 
 export class ArticleCreate extends Component {
   article: Article = {
-    author: 'anon',
+    article_id: 0,
     title: '',
     content: '',
+    author: 'anon',
     edit_time: 0,
-    pageId: 0,
-    version: 0,
+    version_number: 0,
   };
 
   render() {
@@ -215,14 +214,14 @@ export class ArticleCreate extends Component {
   }
 }
 
-export class ArticleEdit extends Component<{ match: { params: { pageId: number } } }> {
+export class ArticleEdit extends Component<{ match: { params: { article_id: number } } }> {
   article: Article = {
-    author: 'anon',
+    article_id: 0,
     title: '',
     content: '',
+    author: 'anon',
     edit_time: 0,
-    pageId: 0,
-    version: 0,
+    version_number: 0,
   };
 
   render() {
@@ -262,7 +261,7 @@ export class ArticleEdit extends Component<{ match: { params: { pageId: number }
             this.article.author = user;
             wikiService
               .createArticle(this.article)
-              .then((id) => history.push('/articles/' + id))
+              .then((article_id) => history.push('/articles/' + article_id))
               .catch((error) => Alert.danger('Error creating article: ' + error.message));
           }}
         >
@@ -274,7 +273,7 @@ export class ArticleEdit extends Component<{ match: { params: { pageId: number }
 
   mounted() {
     wikiService
-      .getArticle(this.props.match.params.pageId)
+      .getArticle(this.props.match.params.article_id)
       .then((article) => (this.article = article))
       .catch((error) => Alert.danger('Error getting article: ' + error.message));
   }

@@ -1,21 +1,20 @@
 import type http from 'http';
 import type https from 'https';
 import WebSocket from 'ws';
-import pool from './mysql-pool';
-import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 type Article = {
-  author: string;
+  article_id: number;
   title: string;
   content: string;
+  author: string;
   edit_time: number;
-  pageId: number;
+  version_number: number;
 };
 
 /**
- * Whiteboard server
+ * Wiki server
  */
-export default class WhiteboardServer {
+export default class WikiServer {
   /**
    * Constructs a WebSocket server that will respond to the given path on webServer.
    */

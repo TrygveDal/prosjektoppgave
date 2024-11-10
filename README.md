@@ -20,24 +20,22 @@ process.env.MYSQL_PASSWORD = 'username_todo';
 process.env.MYSQL_DATABASE = 'username_todo_test';
 ```
 
-edit er returverdi av Date.now(), altså millisekunder etter 1. januar 1970
-
 ```sql
 CREATE TABLE `Versions` (
-  `pageId` INT NOT NULL ,
-  `content` TEXT ,
-  `title` TEXT NOT NULL ,
-  `type` TEXT NOT NULL,
-  `versionnr` INT NOT NULL ,
+  `article_id` INT NOT NULL ,
+  `title` TEXT NOT NULL,
+  `content` TEXT NOT NULL ,
   `author` TEXT NOT NULL,
+  `version_type` TEXT NOT NULL ,
+  `version_number` INT NOT NULL,
   `edit_time` BIGINT NOT NULL,
-  `latest` BOOL NOT NULL
+  `is_newest_version` BOOL NOT NULL
 );
 
 CREATE TABLE `Articles` (
-  `pageId` INT NOT NULL AUTO_INCREMENT ,
+  `id` INT NOT NULL AUTO_INCREMENT ,
   `views` INT NOT NULL ,
-  PRIMARY KEY (`pageId`)
+  PRIMARY KEY (`id`)
 );
 ```
 

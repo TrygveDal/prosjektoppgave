@@ -2,25 +2,25 @@ import pool from './mysql-pool';
 import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 type Article = {
-  author: string;
+  article_id: number;
   title: string;
   content: string;
+  author: string;
   edit_time: number;
-  pageId: number;
 };
-
+//version_type er enten "created", eller "edited"
 type Version = {
   author: string;
   edit_time: number;
-  versionnr: number;
-  type: string;
+  version_number: number;
+  version_type: string;
 };
 
 class WikiService {
   getArticles() {
     return new Promise<Article[]>((resolve, reject) => {
       pool.query(
-        'SELECT author, title, content, `edit_time`, Articles.pageId FROM Articles, Versions WHERE Articles.pageId = Versions.pageId AND latest = 1',
+        'SELECT author, title, content, `edit_time`, article_id FROM Articles, Versions WHERE Articles.id = Versions.article_id AND is_newest_version = 1',
         (error, results: RowDataPacket[]) => {
           if (error) return reject(error);
 
@@ -29,11 +29,11 @@ class WikiService {
       );
     });
   }
-  getArticle(pageId: number) {
+  getArticle(article_id: number) {
     return new Promise<Article | undefined>((resolve, reject) => {
       pool.query(
-        'SELECT author, title, content, `edit_time`, Articles.pageId FROM Articles, Versions WHERE Articles.pageId = Versions.pageId AND latest = 1 AND Articles.pageId = ?',
-        [pageId],
+        'SELECT author, title, content, `edit_time`, article_id FROM Articles, Versions WHERE Articles.id = Versions.article_id AND is_newest_version = 1 AND Articles.id = ?',
+        [article_id],
         (error, results: RowDataPacket[]) => {
           if (error) return reject(error);
 
@@ -43,11 +43,11 @@ class WikiService {
     });
   }
 
-  getVersion(pageId: number, version: number) {
+  getVersion(article_id: number, version_number: number) {
     return new Promise<Article | undefined>((resolve, reject) => {
       pool.query(
-        'SELECT author, title, content, `edit_time`, Articles.pageId FROM Articles, Versions WHERE Articles.pageId = Versions.pageId AND Articles.pageId = ? AND versionnr = ?',
-        [pageId, version],
+        'SELECT author, title, content, `edit_time`, article_id FROM Articles, Versions WHERE Articles.id = Versions.article_id AND Articles.id = ? AND version_number = ?',
+        [article_id, version_number],
         (error, results: RowDataPacket[]) => {
           if (error) return reject(error);
 
@@ -57,11 +57,11 @@ class WikiService {
     });
   }
 
-  viewArticle(pageId: number) {
+  viewArticle(article_id: number) {
     return new Promise<void>((resolve, reject) => {
       pool.query(
-        'UPDATE `Articles` SET `views` = `views`+1 WHERE `pageId` = ?',
-        [pageId],
+        'UPDATE `Articles` SET `views` = `views`+1 WHERE `id` = ?',
+        [article_id],
         (error, results) => {
           if (error) return reject(error);
 
@@ -71,11 +71,11 @@ class WikiService {
     });
   }
 
-  versionHistory(pageId: number) {
+  versionHistory(article_id: number) {
     return new Promise<Version[]>((resolve, reject) => {
       pool.query(
-        'SELECT author, edit_time, versionnr, type FROM Versions WHERE pageId = ?',
-        [pageId],
+        'SELECT author, edit_time, version_number, version_type FROM Versions WHERE article_id = ?',
+        [article_id],
         (error, results: RowDataPacket[]) => {
           if (error) return reject(error);
 
@@ -87,7 +87,7 @@ class WikiService {
 
   createArticle(article: Article) {
     return new Promise<number>((resolve, reject) => {
-      const articleId = new Promise<number>((resolve, reject) => {
+      const article_id = new Promise<number>((resolve, reject) => {
         pool.query(
           'INSERT INTO `Articles`(`views`) VALUES (0)',
           (error, results: ResultSetHeader) => {
@@ -97,10 +97,10 @@ class WikiService {
           },
         );
       });
-      articleId
+      article_id
         .then((id) => {
           pool.query(
-            'INSERT INTO `Versions` (`author`,`content`,`edit_time`,`latest`,`pageId`,`title`,`type`,`versionnr`) VALUES (?,?,?,1,?,?,"init",1)',
+            'INSERT INTO `Versions` (`author`,`content`,`edit_time`,`is_newest_version`,`article_id`,`title`,`version_type`,`version_number`) VALUES (?,?,?,1,?,?,"created",1)',
             [article.author, article.content, article.edit_time, id, article.title],
             (error, results: ResultSetHeader) => {
               if (error) return reject(error);
@@ -114,40 +114,40 @@ class WikiService {
   }
   editArticle(article: Article) {
     return new Promise<number>((resolve, reject) => {
-      const version = new Promise<number>((resolve, reject) => {
+      const version_number = new Promise<number>((resolve, reject) => {
         pool.query(
-          'SELECT `versionnr` FROM `Versions` WHERE `latest` = 1 AND pageId = ?',
-          [article.pageId],
+          'SELECT `version_number` FROM `Versions` WHERE `is_newest_version` = 1 AND article_id = ?',
+          [article.article_id],
           (error, results: RowDataPacket[]) => {
             if (error) return reject(error);
 
-            resolve(results[0].versionnr as number);
+            resolve(results[0].version_number as number);
           },
         );
       });
-      version
-        .then((version) => {
+      version_number
+        .then((version_number) => {
           pool.query(
-            'UPDATE `Versions` SET `latest`=0 WHERE `pageId` = ?',
-            [article.pageId],
+            'UPDATE `Versions` SET `is_newest_version`=0 WHERE `article_id` = ?',
+            [article.article_id],
             (error, results: ResultSetHeader) => {
               if (error) return reject(error);
             },
           );
           pool.query(
-            'INSERT INTO `Versions` (`author`,`content`,`edit_time`,`latest`,`pageId`,`title`,`type`,`versionnr`) VALUES (?,?,?,1,?,?,"edit",?);',
+            'INSERT INTO `Versions` (`author`,`content`,`edit_time`,`is_newest_version`,`article_id`,`title`,`version_type`,`version_number`) VALUES (?,?,?,1,?,?,"edited",?);',
             [
               article.author,
               article.content,
               article.edit_time,
-              article.pageId,
+              article.article_id,
               article.title,
-              version + 1,
+              version_number + 1,
             ],
             (error, results: ResultSetHeader) => {
               if (error) return reject(error);
 
-              resolve(article.pageId);
+              resolve(article.article_id);
             },
           );
         })
