@@ -12,33 +12,33 @@ router.get('/articles', (_request, response) => {
     .then((rows) => response.send(rows))
     .catch((error) => response.status(500).send(error));
 });
-router.get('/articles/:pageId', (request, response) => {
-  const pageId = Number(request.params.pageId);
+router.get('/articles/:article_id', (request, response) => {
+  const article_id = Number(request.params.article_id);
   wikiService
-    .getArticle(pageId)
+    .getArticle(article_id)
     .then((article) => response.send(article))
     .catch((error) => response.status(500).send(error));
 });
-router.get('/articles/:pageId/version/:versionnr', (request, response) => {
-  const pageId = Number(request.params.pageId);
-  const versionnr = Number(request.params.versionnr);
+router.get('/articles/:article_id/version/:version_number', (request, response) => {
+  const article_id = Number(request.params.article_id);
+  const version_number = Number(request.params.version_number);
   wikiService
-    .getVersion(pageId, versionnr)
+    .getVersion(article_id, version_number)
     .then((article) => response.send(article))
     .catch((error) => response.status(500).send(error));
 });
-router.get('/articles/:pageId/versionhistory', (request, response) => {
-  const pageId = Number(request.params.pageId);
+router.get('/articles/:article_id/versionhistory', (request, response) => {
+  const article_id = Number(request.params.article_id);
   wikiService
-    .versionHistory(pageId)
+    .versionHistory(article_id)
     .then((rows) => response.send(rows))
     .catch((error) => response.status(500).send(error));
 });
 
-router.post('/articles/:pageId/viewed', (request, response) => {
-  const pageId = Number(request.params.pageId);
+router.post('/articles/:article_id/viewed', (request, response) => {
+  const article_id = Number(request.params.article_id);
   wikiService
-    .viewArticle(pageId)
+    .viewArticle(article_id)
     .then(() => response.send())
     .catch((error) => response.status(500).send(error));
 });
@@ -46,7 +46,7 @@ router.post('/articles/:pageId/viewed', (request, response) => {
 router.post('/articles', (request, response) => {
   const data = request.body;
   if (data.article && data.article.title && data.article.content && data.article.author)
-    if (data.article.pageId && data.article.pageId != 0) {
+    if (data.article.article_id && data.article.article_id != 0) {
       wikiService
         .editArticle(data.article)
         .then((id) => response.send({ id: id }))

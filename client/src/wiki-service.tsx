@@ -3,19 +3,19 @@ import axios from 'axios';
 axios.defaults.baseURL = 'http://localhost:3000/api/v1';
 
 type Article = {
-  author: string;
+  article_id: number;
   title: string;
   content: string;
+  author: string;
   edit_time: number;
-  pageId: number;
-  version: number;
+  version_number: number;
 };
-
+//version_type er enten "created", eller "edited"
 type Version = {
   author: string;
   edit_time: number;
-  versionnr: number;
-  type: string;
+  version_number: number;
+  version_type: string;
 };
 
 class WikiService {
@@ -26,23 +26,25 @@ class WikiService {
     return axios.get<Article[]>('/articles').then((response) => response.data);
   }
 
-  getArticle(pageId: number) {
-    return axios.get<Article>('/articles/' + pageId).then((response) => response.data);
+  getArticle(article_id: number) {
+    return axios.get<Article>('/articles/' + article_id).then((response) => response.data);
   }
 
-  getVersion(pageId: number, version: number) {
+  getVersion(article_id: number, version_number: number) {
     return axios
-      .get<Article>('/articles/' + pageId + '/version/' + version)
+      .get<Article>('/articles/' + article_id + '/version/' + version_number)
       .then((response) => response.data);
   }
 
-  viewArticle(pageId: number) {
-    return axios.post<void>('/articles/' + pageId + '/viewed').then((response) => response.data);
+  viewArticle(article_id: number) {
+    return axios
+      .post<void>('/articles/' + article_id + '/viewed')
+      .then((response) => response.data);
   }
 
-  versionHistory(pageId: number) {
+  versionHistory(article_id: number) {
     return axios
-      .get<Version[]>('/articles/' + pageId + '/versionhistory')
+      .get<Version[]>('/articles/' + article_id + '/versionhistory')
       .then((response) => response.data);
   }
 
@@ -50,8 +52,8 @@ class WikiService {
   createArticle(article: Article) {
     article.edit_time = Date.now();
     return axios
-      .post<{ id: number }>('/articles', { article })
-      .then((response) => response.data.id);
+      .post<{ article_id: number }>('/articles', { article })
+      .then((response) => response.data.article_id);
   }
 }
 
