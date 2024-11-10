@@ -39,7 +39,13 @@ export class ArticleDetails extends Component<{
     return (
       <>
         <Card title={this.article.title}>
-          <Row>Last edit by: {this.article.author}</Row>
+          {this.props.match.params.versionnr ? (
+            <Row>
+              <Column>Viewing version {this.props.match.params.versionnr}</Column>
+            </Row>
+          ) : (
+            <></>
+          )}
           <Row>
             <Card title="">{this.article.content}</Card>
           </Row>
