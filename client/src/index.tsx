@@ -13,6 +13,11 @@ if (root)
         <NavPageHeader />
         <Route exact path="/" component={ArticleList} />
         <Route exact path="/articles/:pageId(\d+)" component={ArticleDetails} />
+        <Route
+          exact
+          path="/articles/:pageId(\d+)/version/:versionnr(\d+)"
+          component={ArticleDetails}
+        />
         <Route exact path="/articles/new" component={ArticleCreate} />
         <Route exact path="/articles/:pageId(\d+)/edit" component={ArticleEdit} />
       </>

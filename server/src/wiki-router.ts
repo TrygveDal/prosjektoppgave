@@ -19,6 +19,21 @@ router.get('/articles/:pageId', (request, response) => {
     .then((article) => response.send(article))
     .catch((error) => response.status(500).send(error));
 });
+router.get('/articles/:pageId/version/:versionnr', (request, response) => {
+  const pageId = Number(request.params.pageId);
+  const versionnr = Number(request.params.versionnr);
+  wikiService
+    .getVersion(pageId, versionnr)
+    .then((article) => response.send(article))
+    .catch((error) => response.status(500).send(error));
+});
+router.get('/articles/:pageId/versionhistory', (request, response) => {
+  const pageId = Number(request.params.pageId);
+  wikiService
+    .versionHistory(pageId)
+    .then((rows) => response.send(rows))
+    .catch((error) => response.status(500).send(error));
+});
 
 router.post('/articles/:pageId/viewed', (request, response) => {
   const pageId = Number(request.params.pageId);
