@@ -16,6 +16,14 @@ type Version = {
   version_type: string;
 };
 
+//comment type:
+type Comment = {
+  comment_id: number;
+  article_id: number;
+  user: string;
+  content: string;
+};
+
 class WikiService {
   getArticles() {
     return new Promise<Article[]>((resolve, reject) => {
@@ -152,6 +160,20 @@ class WikiService {
           );
         })
         .catch((error) => reject(error));
+    });
+  }
+
+  addComment(comment: Comment) {
+    return new Promise<number>((resolve, reject) => {
+      pool.query(
+        'INSERT INTO `Comments` (`article_id`,`user`,`content`) VALUES (?,?,?);',
+        [comment.article_id, comment.user, comment.content],
+        (error, results: ResultSetHeader) => {
+          if (error) return reject(error);
+          // returns the id of the new comment
+          resolve(results.insertId as number);
+        },
+      );
     });
   }
 }

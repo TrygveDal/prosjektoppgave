@@ -45,9 +45,11 @@ CREATE TABLE `Tags` (
   );
 
 CREATE TABLE `Comments` (
+  `comment_id` INT NOT NULL AUTO_INCREMENT,
   `article_id` INT NOT NULL ,
   `user` TEXT NOT NULL ,
-  `content` TEXT NOT NULL
+  `content` TEXT NOT NULL,
+  PRIMARY KEY (`comment_id`)
   );
 
 CREATE TABLE `Articles_Tags` (

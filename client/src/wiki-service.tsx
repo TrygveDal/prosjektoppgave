@@ -10,12 +10,20 @@ type Article = {
   edit_time: number;
   version_number: number;
 };
-//version_type is eiter "created" or "edited"
+//version_type is either "created" or "edited"
 type Version = {
   author: string;
   edit_time: number;
   version_number: number;
   version_type: string;
+};
+
+//comment type:
+type Comment = {
+  comment_id: number;
+  article_id: number;
+  user: string;
+  content: string;
 };
 
 class WikiService {
@@ -54,6 +62,15 @@ class WikiService {
     return axios
       .post<{ article_id: number }>('/articles', { article })
       .then((response) => response.data.article_id);
+  }
+
+  // Add comment:
+  addComment(comment: Comment) {
+    return axios
+      .post<{
+        comment_id: number;
+      }>('/articles/' + comment.article_id + '/comments/new', { comment })
+      .then((Response) => Response.data.comment_id);
   }
 }
 

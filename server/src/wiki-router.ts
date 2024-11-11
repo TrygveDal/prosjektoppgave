@@ -60,4 +60,15 @@ router.post('/articles', (request, response) => {
   else response.status(400).send('Missing data');
 });
 
+router.post('/articles/:article_id/comments/new', (request, response) => {
+  const data = request.body;
+  if (data.comment && data.comment.content && data.comment.user && data.comment.article_id)
+    if (data.comment.article_id != 0) {
+      wikiService
+        .addComment(data.comment)
+        .then((id) => response.send({ comment_id: id }))
+        .catch((error) => response.status(500).send(error));
+    }
+});
+
 export default router;
