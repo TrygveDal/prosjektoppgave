@@ -7,6 +7,7 @@ type Article = {
   content: string;
   author: string;
   edit_time: number;
+  version_number: number;
 };
 //version_type is either "created" or "edited"
 type Version = {
@@ -54,7 +55,7 @@ class WikiService {
   getArticle(article_id: number) {
     return new Promise<Article | undefined>((resolve, reject) => {
       pool.query(
-        'SELECT author, title, content, `edit_time`, article_id FROM Articles, Versions WHERE Articles.id = Versions.article_id AND is_newest_version = 1 AND Articles.id = ?',
+        'SELECT author, title, content, `edit_time`, article_id, version_number FROM Articles, Versions WHERE Articles.id = Versions.article_id AND is_newest_version = 1 AND Articles.id = ?',
         [article_id],
         (error, results: RowDataPacket[]) => {
           if (error) return reject(error);
@@ -68,7 +69,7 @@ class WikiService {
   getVersion(article_id: number, version_number: number) {
     return new Promise<Article | undefined>((resolve, reject) => {
       pool.query(
-        'SELECT author, title, content, `edit_time`, article_id FROM Articles, Versions WHERE Articles.id = Versions.article_id AND Articles.id = ? AND version_number = ?',
+        'SELECT article_id, title, content, author, `edit_time`, version_number FROM Articles, Versions WHERE Articles.id = Versions.article_id AND Articles.id = ? AND version_number = ?',
         [article_id, version_number],
         (error, results: RowDataPacket[]) => {
           if (error) return reject(error);
@@ -88,6 +89,20 @@ class WikiService {
           if (error) return reject(error);
 
           resolve();
+        },
+      );
+    });
+  }
+
+  getViews(article_id: number) {
+    return new Promise<number>((resolve, reject) => {
+      pool.query(
+        'SELECT `views` FROM `Articles` WHERE `id` = ?',
+        [article_id],
+        (error, results: RowDataPacket[]) => {
+          if (error) return reject(error);
+
+          resolve(results[0].views as number);
         },
       );
     });

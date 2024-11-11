@@ -42,6 +42,14 @@ router.get('/articles/:article_id/versionhistory', (request, response) => {
     .catch((error) => response.status(500).send(error));
 });
 
+router.get('/articles/:article_id/views', (request, response) => {
+  const article_id = Number(request.params.article_id);
+  wikiService
+    .getViews(article_id)
+    .then((views) => response.send({ views: views }))
+    .catch((error) => response.status(500).send(error));
+});
+
 router.post('/articles/:article_id/viewed', (request, response) => {
   const article_id = Number(request.params.article_id);
   wikiService
