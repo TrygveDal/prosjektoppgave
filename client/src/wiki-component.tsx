@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
 import { Alert, Card, Row, Column, Button, Form } from './widgets';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useParams } from 'react-router-dom';
 import wikiService from './wiki-service';
 import { createHashHistory } from 'history';
 
@@ -15,12 +15,20 @@ type Article = {
   edit_time: number;
   version_number: number;
 };
-//version_type er enten "createt", eller "edited"
+// version_type is either "created", or "edited"
 type Version = {
   author: string;
   edit_time: number;
   version_number: number;
   version_type: string;
+};
+
+// comment type:
+type Comment = {
+  comment_id: number;
+  article_id: number;
+  user: string;
+  content: string;
 };
 
 export class ArticleDetails extends Component<{
@@ -55,6 +63,7 @@ export class ArticleDetails extends Component<{
         >
           Edit
         </Button.Success>
+        <CommentCreate article_id={this.props.match.params.article_id} />
         <VersionHistory article_id={this.props.match.params.article_id} />
       </>
     );
@@ -276,5 +285,53 @@ export class ArticleEdit extends Component<{ match: { params: { article_id: numb
       .getArticle(this.props.match.params.article_id)
       .then((article) => (this.article = article))
       .catch((error) => Alert.danger('Error getting article: ' + error.message));
+  }
+}
+
+export class CommentCreate extends Component<{ article_id: number }> {
+  comment: Comment = {
+    comment_id: 0,
+    article_id: 0,
+    user: '',
+    content: '',
+  };
+
+  render() {
+    return (
+      <div style={{ width: 70 + '%' }}>
+        <Card title="Comment:">
+          <Form.Textarea
+            type="text"
+            value={this.comment.content}
+            onChange={(event) => {
+              this.comment.content = event.currentTarget.value;
+            }}
+            rows={3}
+          ></Form.Textarea>
+        </Card>
+        <Button.Success
+          onClick={() => {
+            const user = String(prompt('Username:'));
+            this.comment.user = user;
+            this.comment.article_id = this.props.article_id;
+            wikiService
+              .addComment(this.comment)
+              .catch((error) => Alert.danger('Error adding comment: ' + error.message));
+          }}
+        >
+          Add comment
+        </Button.Success>
+      </div>
+    );
+  }
+}
+
+export class Login extends Component {
+  render() {
+    return (
+      <div>
+        <h1>Log in</h1>
+      </div>
+    );
   }
 }
