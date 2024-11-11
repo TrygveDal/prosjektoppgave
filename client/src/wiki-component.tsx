@@ -42,11 +42,20 @@ export class ArticleDetails extends Component<{
     edit_time: 0,
     version_number: 0,
   };
+  views: number = 0;
 
   render() {
     return (
       <>
         <Card title={this.article.title}>
+          <div
+            style={{ color: 'blue' }}
+            onClick={() => {
+              Alert.info('Version: ' + this.article.version_number + ' Views: ' + this.views);
+            }}
+          >
+            Page statistics
+          </div>
           {this.props.match.params.version_number ? (
             <Row>
               <Column>Viewing version {this.props.match.params.version_number}</Column>
@@ -74,12 +83,16 @@ export class ArticleDetails extends Component<{
       wikiService
         .getVersion(this.props.match.params.article_id, this.props.match.params.version_number)
         .then((article) => (this.article = article))
+        .then(() => wikiService.getViews(this.article.article_id))
+        .then((response) => (this.views = response.views))
         .catch((error) => Alert.danger('Error getting article: ' + error.message));
     } else {
       wikiService
         .getArticle(this.props.match.params.article_id)
         .then((article) => (this.article = article))
         .then(() => wikiService.viewArticle(this.article.article_id))
+        .then(() => wikiService.getViews(this.article.article_id))
+        .then((response) => (this.views = response.views))
         .catch((error) => Alert.danger('Error getting article: ' + error.message));
     }
   }

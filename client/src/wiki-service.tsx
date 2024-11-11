@@ -54,6 +54,12 @@ class WikiService {
       .then((response) => response.data);
   }
 
+  getViews(article_id: number) {
+    return axios
+      .get<{ views: number }>('/articles/' + article_id + '/views')
+      .then((response) => response.data);
+  }
+
   versionHistory(article_id: number) {
     return axios
       .get<Version[]>('/articles/' + article_id + '/versionhistory')
