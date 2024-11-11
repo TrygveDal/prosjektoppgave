@@ -12,6 +12,13 @@ router.get('/articles', (_request, response) => {
     .then((rows) => response.send(rows))
     .catch((error) => response.status(500).send(error));
 });
+router.get('/articles/search/:query', (request, response) => {
+  const query = request.params.query;
+  wikiService
+    .searchArticles(query)
+    .then((rows) => response.send(rows))
+    .catch((error) => response.status(500).send(error));
+});
 router.get('/articles/:article_id', (request, response) => {
   const article_id = Number(request.params.article_id);
   wikiService

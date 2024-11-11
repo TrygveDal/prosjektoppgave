@@ -23,6 +23,7 @@ export class Card extends Component<{ title: ReactNode }> {
 }
 
 export class NavPageHeader extends Component {
+  query: string = '';
   render() {
     return (
       <nav className="navbar navbar-expand-lg bg-body-tertiary navbar-light">
@@ -49,10 +50,19 @@ export class NavPageHeader extends Component {
                     type="search"
                     placeholder="Search"
                     aria-label="Search"
+                    value={this.query}
+                    onChange={(event) => {
+                      this.query = event.currentTarget.value;
+                    }}
                   />
-                  <button className="btn btn-outline-success search-btn" type="submit">
-                    Search
-                  </button>
+                  <NavLink
+                    style={{ color: 'inherit', textDecoration: 'inherit' }}
+                    to={'/articles/search/' + this.query}
+                  >
+                    <button className="btn btn-outline-success search-btn" type="submit">
+                      Search
+                    </button>
+                  </NavLink>
                 </form>
               </li>
               <li className="nav-item hyperlinks">
