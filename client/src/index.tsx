@@ -12,6 +12,7 @@ if (root)
         <Alert />
         <NavPageHeader />
         <Route exact path="/" component={ArticleList} />
+        <Route exact path="/articles/search/:search_query([\w\s]+)" component={ArticleList} />
         <Route exact path="/articles/:article_id(\d+)" component={ArticleDetails} />
         <Route
           exact

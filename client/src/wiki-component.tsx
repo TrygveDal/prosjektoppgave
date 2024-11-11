@@ -85,45 +85,60 @@ export class ArticleDetails extends Component<{
   }
 }
 
-export class ArticleList extends Component {
+export class ArticleList extends Component<{ match: { params: { search_query?: string } } }> {
   articles: Article[] = [];
 
   render() {
     return (
       <>
         <Card title="Articles">
-          <Row>
-            <Column>Article</Column>
-            <Column>Last edited by</Column>
-            <Column>Last edit at</Column>
-          </Row>
-          {this.articles.map((article, i) => (
-            <Row key={i}>
-              <Column>
-                <NavLink
-                  to={'/articles/' + article.article_id}
-                  style={{ color: 'inherit', textDecoration: 'inherit' }}
-                >
-                  {article.title}
-                </NavLink>
-              </Column>
+          {this.articles.length > 0 ? (
+            <>
+              <Row>
+                <Column>Article</Column>
+                <Column>Last edited by</Column>
+                <Column>Last edit at</Column>
+              </Row>
+              {this.articles.map((article, i) => (
+                <Row key={i}>
+                  <Column>
+                    <NavLink
+                      to={'/articles/' + article.article_id}
+                      style={{ color: 'inherit', textDecoration: 'inherit' }}
+                    >
+                      {article.title}
+                    </NavLink>
+                  </Column>
 
-              <Column>{article.author}</Column>
-              <Column>{new Date(article.edit_time).toLocaleString()}</Column>
-            </Row>
-          ))}
+                  <Column>{article.author}</Column>
+                  <Column>{new Date(article.edit_time).toLocaleString()}</Column>
+                </Row>
+              ))}
+            </>
+          ) : (
+            <div>No articles found</div>
+          )}
         </Card>
       </>
     );
   }
 
   mounted() {
-    wikiService
-      .getArticles()
-      .then((articles) => {
-        this.articles = articles;
-      })
-      .catch((error) => Alert.danger('Error getting articles: ' + error.message));
+    if (this.props.match.params.search_query) {
+      wikiService
+        .searchArticles(this.props.match.params.search_query)
+        .then((articles) => {
+          this.articles = articles;
+        })
+        .catch((error) => Alert.danger('Error getting articles: ' + error.message));
+    } else {
+      wikiService
+        .getArticles()
+        .then((articles) => {
+          this.articles = articles;
+        })
+        .catch((error) => Alert.danger('Error getting articles: ' + error.message));
+    }
   }
 }
 

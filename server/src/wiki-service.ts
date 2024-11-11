@@ -37,6 +37,20 @@ class WikiService {
       );
     });
   }
+  searchArticles(query: string) {
+    return new Promise<Article[]>((resolve, reject) => {
+      const _query = '%' + query.toLowerCase() + '%';
+      pool.query(
+        'SELECT author, title, content, `edit_time`, article_id FROM Articles, Versions WHERE Articles.id = Versions.article_id AND is_newest_version = 1 AND (LOWER(content) LIKE ? OR LOWER(title) LIKE ?)',
+        [_query, _query],
+        (error, results: RowDataPacket[]) => {
+          if (error) return reject(error);
+
+          resolve(results as Article[]);
+        },
+      );
+    });
+  }
   getArticle(article_id: number) {
     return new Promise<Article | undefined>((resolve, reject) => {
       pool.query(
