@@ -86,4 +86,12 @@ router.post('/articles/:article_id/comments/new', (request, response) => {
     }
 });
 
+router.delete('/articles/delete/:article_id', (request, response) => {
+  const article_id = Number(request.params.article_id);
+  wikiService
+    .deleteArticle(article_id)
+    .then(() => response.send())
+    .catch((error) => response.status(500).send(error));
+});
+
 export default router;

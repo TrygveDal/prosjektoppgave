@@ -205,6 +205,32 @@ class WikiService {
       );
     });
   }
+  deleteArticle(article_id: number) {
+    return new Promise<void>((resolve, reject) => {
+      pool.query(
+        'DELETE FROM `Articles` WHERE `id`= ?;',
+        [article_id],
+        (error, results: ResultSetHeader[]) => {
+          if (error) return reject(error);
+        },
+      );
+      pool.query(
+        'DELETE FROM `Versions` WHERE `Versions`.`article_id` = ?;',
+        [article_id],
+        (error, results: ResultSetHeader[]) => {
+          if (error) return reject(error);
+        },
+      );
+      pool.query(
+        'DELETE FROM `Comments` WHERE `Comments`.`article_id` = ?;',
+        [article_id],
+        (error, results: ResultSetHeader[]) => {
+          if (error) return reject(error);
+        },
+      );
+      resolve();
+    });
+  }
 }
 
 const wikiService = new WikiService();

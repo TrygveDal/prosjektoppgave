@@ -304,6 +304,16 @@ export class ArticleEdit extends Component<{ match: { params: { article_id: numb
         >
           Save
         </Button.Success>
+        <Button.Danger
+          onClick={() =>
+            wikiService
+              .deleteArticle(this.article.article_id)
+              .then(() => history.push('/'))
+              .catch((error) => Alert.danger('Error deleting article: ' + error.message))
+          }
+        >
+          Delete
+        </Button.Danger>
       </>
     );
   }
