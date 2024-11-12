@@ -37,6 +37,11 @@ class WikiService {
   searchArticles(query: string) {
     return axios.get<Article[]>('/articles/search/' + query).then((response) => response.data);
   }
+  searchTitles(query: string) {
+    return axios
+      .get<{ article_id: number; title: string }[]>('/search/titles/' + query)
+      .then((response) => response.data);
+  }
 
   getArticle(article_id: number) {
     return axios.get<Article>('/articles/' + article_id).then((response) => response.data);

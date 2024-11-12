@@ -1,7 +1,9 @@
 import * as React from 'react';
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
 import { Component } from 'react-simplified';
 import { Alert, Card, Row, Column, Button, Form } from './widgets';
-import { NavLink, useParams } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import wikiService from './wiki-service';
 import { createHashHistory } from 'history';
 
@@ -43,6 +45,13 @@ export class ArticleDetails extends Component<{
     version_number: 0,
   };
   views: number = 0;
+  content_formatted: HTMLDivElement | null = null;
+
+  formatContent(content: string) {
+    let temp: HTMLDivElement = document.createElement('div');
+    temp.innerHTML = content;
+    return temp;
+  }
 
   render() {
     return (
@@ -64,7 +73,9 @@ export class ArticleDetails extends Component<{
             <></>
           )}
           <Row>
-            <Card title="">{this.article.content}</Card>
+            <Card title="">
+              <div ref={(e) => (this.content_formatted = e)}></div>
+            </Card>
           </Row>
         </Card>
         <Button.Success
@@ -83,6 +94,11 @@ export class ArticleDetails extends Component<{
       wikiService
         .getVersion(this.props.match.params.article_id, this.props.match.params.version_number)
         .then((article) => (this.article = article))
+        .then((article) => {
+          if (this.content_formatted != null) {
+            this.content_formatted.innerHTML = article.content;
+          }
+        })
         .then(() => wikiService.getViews(this.article.article_id))
         .then((response) => (this.views = response.views))
         .catch((error) => Alert.danger('Error getting article: ' + error.message));
@@ -90,6 +106,11 @@ export class ArticleDetails extends Component<{
       wikiService
         .getArticle(this.props.match.params.article_id)
         .then((article) => (this.article = article))
+        .then((article) => {
+          if (this.content_formatted != null) {
+            this.content_formatted.innerHTML = article.content;
+          }
+        })
         .then(() => wikiService.viewArticle(this.article.article_id))
         .then(() => wikiService.getViews(this.article.article_id))
         .then((response) => (this.views = response.views))
@@ -155,6 +176,18 @@ export class ArticleList extends Component<{ match: { params: { search_query?: s
   }
 }
 
+export class FormattedContent extends Component<{ content: string }> {
+  temp: HTMLDivElement = document.createElement('div');
+
+  render() {
+    return <></>;
+  }
+  mounted() {
+    this.temp.innerHTML = this.props.content;
+    console.log(this.temp);
+  }
+}
+
 export class VersionHistory extends Component<{ article_id: number }> {
   versions: Version[] = [];
 
@@ -203,6 +236,20 @@ export class ArticleCreate extends Component {
     version_number: 0,
   };
 
+  onSelectHyperlink = (article_id: number) => {
+    if (article_id && article_id != 0) {
+      this.article.content +=
+        '<HyperlinkArticle article_id={' +
+        String(article_id) +
+        '} text={' +
+        String(prompt('text to display as hyperlink: ')) +
+        '} />';
+    }
+    this.query = '';
+  };
+
+  query: string = '';
+
   render() {
     return (
       <>
@@ -231,6 +278,20 @@ export class ArticleCreate extends Component {
                 }}
                 rows={10}
               />
+            </Column>
+            <Column>
+              <Popup trigger={<button> Link to article</button>}>
+                <Form.Input
+                  type="text"
+                  value={this.query}
+                  onChange={(event) => (this.query = event.currentTarget.value)}
+                />
+                {this.query && this.query.length > 0 ? (
+                  <SearchList search_query={this.query} handleSelect={this.onSelectHyperlink} />
+                ) : (
+                  <></>
+                )}
+              </Popup>
             </Column>
           </Row>
         </Card>
@@ -261,6 +322,20 @@ export class ArticleEdit extends Component<{ match: { params: { article_id: numb
     version_number: 0,
   };
 
+  onSelectHyperlink = (article_id: number) => {
+    if (article_id && article_id != 0) {
+      this.article.content +=
+        '<HyperlinkArticle article_id=' +
+        article_id +
+        ' text=' +
+        prompt('text to display as hyperlink: ') +
+        ' />';
+    }
+    this.query = '';
+  };
+
+  query: string = '';
+
   render() {
     return (
       <>
@@ -289,6 +364,20 @@ export class ArticleEdit extends Component<{ match: { params: { article_id: numb
                 }}
                 rows={10}
               />
+            </Column>
+            <Column>
+              <Popup trigger={<button> Link to article</button>}>
+                <Form.Input
+                  type="text"
+                  value={this.query}
+                  onChange={(event) => (this.query = event.currentTarget.value)}
+                />
+                {this.query && this.query.length > 0 ? (
+                  <SearchList search_query={this.query} handleSelect={this.onSelectHyperlink} />
+                ) : (
+                  <></>
+                )}
+              </Popup>
             </Column>
           </Row>
         </Card>
@@ -361,6 +450,50 @@ export class CommentCreate extends Component<{ article_id: number }> {
         </Button.Success>
       </div>
     );
+  }
+}
+
+export class SearchList extends Component<{
+  search_query: string;
+  handleSelect: (article_id: number) => void;
+}> {
+  articles: { article_id: number; title: string }[] = [];
+
+  render() {
+    return (
+      <>
+        {this.articles.length > 0 ? (
+          <>
+            {this.articles.map((article) => (
+              <Button.Light
+                onClick={() => this.props.handleSelect(article.article_id)}
+                key={article.article_id}
+              >
+                {article.title}
+              </Button.Light>
+            ))}
+          </>
+        ) : (
+          <></>
+        )}
+      </>
+    );
+  }
+
+  mounted() {
+    wikiService
+      .searchTitles(this.props.search_query)
+      .then((articles) => {
+        this.articles = articles;
+      })
+      .catch((error) => Alert.danger('Error getting articles: ' + error.message));
+  }
+}
+
+// article_id is article that NavLink links to, text is what gets shown returns <NavLink />
+export class HyperlinkArticle extends Component<{ article_id: number; text: string }> {
+  render() {
+    return <NavLink to={'/articles/' + this.props.article_id}>{this.props.text}</NavLink>;
   }
 }
 
