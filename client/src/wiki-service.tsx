@@ -82,6 +82,10 @@ class WikiService {
       }>('/articles/' + comment.article_id + '/comments/new', { comment })
       .then((Response) => Response.data.comment_id);
   }
+
+  deleteArticle(article_id: number) {
+    return axios.delete<void>('/articles/delete/' + article_id);
+  }
 }
 
 const wikiService = new WikiService();
