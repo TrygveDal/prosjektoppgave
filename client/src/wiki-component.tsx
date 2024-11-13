@@ -47,12 +47,6 @@ export class ArticleDetails extends Component<{
   views: number = 0;
   content_formatted: HTMLDivElement | null = null;
 
-  formatContent(content: string) {
-    let temp: HTMLDivElement = document.createElement('div');
-    temp.innerHTML = content;
-    return temp;
-  }
-
   render() {
     return (
       <>
@@ -95,9 +89,7 @@ export class ArticleDetails extends Component<{
         .getVersion(this.props.match.params.article_id, this.props.match.params.version_number)
         .then((article) => (this.article = article))
         .then((article) => {
-          if (this.content_formatted != null) {
-            this.content_formatted.innerHTML = article.content;
-          }
+          if (this.content_formatted != null) this.content_formatted.innerHTML = article.content;
         })
         .then(() => wikiService.getViews(this.article.article_id))
         .then((response) => (this.views = response.views))
@@ -107,9 +99,7 @@ export class ArticleDetails extends Component<{
         .getArticle(this.props.match.params.article_id)
         .then((article) => (this.article = article))
         .then((article) => {
-          if (this.content_formatted != null) {
-            this.content_formatted.innerHTML = article.content;
-          }
+          if (this.content_formatted != null) this.content_formatted.innerHTML = article.content;
         })
         .then(() => wikiService.viewArticle(this.article.article_id))
         .then(() => wikiService.getViews(this.article.article_id))
@@ -235,15 +225,14 @@ export class ArticleCreate extends Component {
     edit_time: 0,
     version_number: 0,
   };
-
   onSelectHyperlink = (article_id: number) => {
     if (article_id && article_id != 0) {
       this.article.content +=
-        '<HyperlinkArticle article_id={' +
-        String(article_id) +
-        '} text={' +
-        String(prompt('text to display as hyperlink: ')) +
-        '} />';
+        '<a href="/#/articles/' +
+        article_id +
+        '">' +
+        prompt('text to display as hyperlink: ') +
+        '</a>';
     }
     this.query = '';
   };
@@ -487,13 +476,6 @@ export class SearchList extends Component<{
         this.articles = articles;
       })
       .catch((error) => Alert.danger('Error getting articles: ' + error.message));
-  }
-}
-
-// article_id is article that NavLink links to, text is what gets shown returns <NavLink />
-export class HyperlinkArticle extends Component<{ article_id: number; text: string }> {
-  render() {
-    return <NavLink to={'/articles/' + this.props.article_id}>{this.props.text}</NavLink>;
   }
 }
 
