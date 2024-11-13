@@ -48,6 +48,7 @@ export class ArticleDetails extends Component<{
     version_number: 0,
   };
   views: number = 0;
+  comments: Comment[] = [];
 
   render() {
     return (
@@ -77,6 +78,40 @@ export class ArticleDetails extends Component<{
         >
           Edit
         </Button.Success>
+        <Card title="Comments">
+          <Row>
+            <Column>comment:</Column>
+            <Column>Added by:</Column>
+            <Column>Edit:</Column>
+            <Column>Delete:</Column>
+          </Row>
+          {this.comments.map((comment, i) => (
+            <Row key={i}>
+              <Column>{comment.content}</Column>
+              <Column>{comment.user}</Column>
+              <Column>
+                <Button.Light
+                  onClick={() => {
+                    const newContent = String(prompt('Write your comment:'));
+                    comment.content = newContent;
+                    wikiService.editComment(comment);
+                  }}
+                >
+                  Edit
+                </Button.Light>
+              </Column>
+              <Column>
+                <Button.Danger
+                  onClick={() => {
+                    wikiService.deleteComment(comment);
+                  }}
+                >
+                  X
+                </Button.Danger>
+              </Column>
+            </Row>
+          ))}
+        </Card>
         <CommentCreate article_id={this.props.match.params.article_id} />
         <VersionHistory article_id={this.props.match.params.article_id} />
       </>
@@ -100,6 +135,10 @@ export class ArticleDetails extends Component<{
         .then((response) => (this.views = response.views))
         .catch((error) => Alert.danger('Error getting article: ' + error.message));
     }
+    wikiService
+      .getComments(this.props.match.params.article_id)
+      .then((comments) => (this.comments = comments))
+      .catch((error) => Alert.danger('Error getting comments: ' + error.message));
   }
 }
 
