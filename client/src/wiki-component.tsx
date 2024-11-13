@@ -31,6 +31,11 @@ type Comment = {
   content: string;
 };
 
+type Tag = {
+  id: number;
+  tag: string;
+};
+
 export class ArticleDetails extends Component<{
   match: { params: { article_id: number; version_number?: number } };
 }> {
@@ -371,5 +376,75 @@ export class Login extends Component {
         <h1>Log in</h1>
       </div>
     );
+  }
+}
+
+export class TagList extends Component {
+  tags: Tag[] = [];
+  checked: number[] = [];
+
+  render() {
+    return (
+      <div>
+        <Card title="Tags">
+          <Row>
+            {this.tags.map((tag) => (
+              <Column key={tag.id} width={1}>
+                <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                  <Form.Checkbox
+                    onChange={() => {
+                      this.checkBoxUpdate(tag.id);
+                    }}
+                    checked={this.checked.includes(tag.id)}
+                    style={{ display: 'none' }}
+                  ></Form.Checkbox>
+                  <span
+                    onClick={() => this.checkBoxUpdate(tag.id)}
+                    style={{
+                      display: 'inline-block',
+                      border: '2px solid black',
+                      padding: '4px 2px',
+                      backgroundColor: this.checked.includes(tag.id)
+                        ? 'rgb(0, 0, 0)'
+                        : 'transparent',
+                      cursor: 'pointer',
+                      color: this.checked.includes(tag.id) ? 'white' : 'black',
+                    }}
+                  >
+                    {tag.tag}
+                  </span>
+                </div>
+              </Column>
+            ))}
+          </Row>
+          <Row>
+            <Column width={1}>
+              <Button.Success
+                onClick={() => {
+                  console.log(this.checked);
+                }}
+              >
+                Test
+              </Button.Success>
+            </Column>
+          </Row>
+        </Card>
+      </div>
+    );
+  }
+
+  mounted() {
+    wikiService
+      .getTags()
+      .then((tags) => (this.tags = tags))
+      .catch((error) => Alert.danger('Error getting Tags: ' + error.message));
+  }
+
+  checkBoxUpdate(id: number) {
+    if (this.checked.includes(id)) {
+      this.checked = this.checked.filter((e) => e !== id);
+    } else {
+      this.checked.push(id);
+    }
   }
 }
