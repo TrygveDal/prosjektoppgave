@@ -26,6 +26,11 @@ type Comment = {
   content: string;
 };
 
+type Tag = {
+  id: number;
+  tag: string;
+};
+
 class WikiService {
   /**
    * Get all articles.
@@ -85,6 +90,11 @@ class WikiService {
 
   deleteArticle(article_id: number) {
     return axios.delete<void>('/articles/delete/' + article_id);
+  }
+
+  // tag
+  getTags() {
+    return axios.get<Tag[]>('/tags').then((response) => response.data);
   }
 }
 

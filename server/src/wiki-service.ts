@@ -25,6 +25,11 @@ type Comment = {
   content: string;
 };
 
+type Tag = {
+  id: number;
+  tag: string;
+};
+
 class WikiService {
   getArticles() {
     return new Promise<Article[]>((resolve, reject) => {
@@ -229,6 +234,17 @@ class WikiService {
         },
       );
       resolve();
+    });
+  }
+
+  // Tags
+  getTags() {
+    return new Promise<Tag[]>((resolve, reject) => {
+      pool.query('SELECT * FROM Tags', [], (error, results: RowDataPacket[]) => {
+        if (error) return reject(error);
+
+        resolve(results as Tag[]);
+      });
     });
   }
 }

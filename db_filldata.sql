@@ -9,3 +9,9 @@ INSERT INTO `Versions`(`article_id`, `title`, `content`, `author`, `version_type
 INSERT INTO `Versions`(`article_id`, `title`, `content`, `author`, `version_type`, `edit_time`, `is_newest_version`) VALUES (3, "Artikkel 3", "Denne artikkelen inneholder informasjon om temaet til artikkel 3", "Kjell Loke", "created", 1, 1);
 INSERT INTO `Versions`(`article_id`, `title`, `content`, `author`, `version_type`, `edit_time`, `is_newest_version`) VALUES (4, "Artikkel 4", "Denne artikkelen inneholder informasjon om temaet til artikkel 4", "Ruben", "created", 1, 1);
 INSERT INTO `Versions`(`article_id`, `title`, `content`, `author`, `version_type`, `edit_time`, `is_newest_version`) VALUES (5, "Artikkel 5", "Denne artikkelen inneholder informasjon om temaet til artikkel 5", "Kari", "created", 1, 1);
+
+//Tags
+INSERT INTO `Tags`(id, tag) VALUES
+(1, '2024'),
+(2, 'Sommer'),
+(3, 'Vitenskap');

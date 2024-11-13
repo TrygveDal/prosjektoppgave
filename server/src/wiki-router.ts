@@ -94,4 +94,12 @@ router.delete('/articles/delete/:article_id', (request, response) => {
     .catch((error) => response.status(500).send(error));
 });
 
+// Tags
+router.get('/tags', (_request, response) => {
+  wikiService
+    .getTags()
+    .then((tags) => response.send(tags))
+    .catch((error) => response.status(500).send(error));
+});
+
 export default router;
