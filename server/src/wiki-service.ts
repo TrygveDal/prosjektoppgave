@@ -210,6 +210,39 @@ class WikiService {
       );
     });
   }
+
+  getComments(article_id: number) {
+    return new Promise<Comment[] | undefined>((resolve, reject) => {
+      pool.query(
+        'SELECT comment_id,article_id,  user, content FROM Comments WHERE article_id=? ',
+        [article_id],
+        (error, results: RowDataPacket[]) => {
+          if (error) return reject(error);
+          resolve(results as Comment[]);
+        },
+      );
+    });
+  }
+  deleteComment(comment_id: number) {
+    return new Promise((resolve, reject) => {
+      pool.query('DELETE FROM Comments WHERE comment_id = ?', [comment_id], (error) => {
+        if (error) return reject(error);
+      });
+    });
+  }
+  editComment(comment: Comment) {
+    return new Promise<void>((resolve, reject) => {
+      pool.query(
+        'UPDATE Comments SET content= ?  WHERE comment_id= ?;',
+        [comment.content, comment.comment_id],
+        (error, results) => {
+          if (error) return reject(error);
+          resolve();
+        },
+      );
+    });
+  }
+
   deleteArticle(article_id: number) {
     return new Promise<void>((resolve, reject) => {
       pool.query(

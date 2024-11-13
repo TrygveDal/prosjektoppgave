@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { response } from 'express';
 import wikiService from './wiki-service';
 
 /**
@@ -84,6 +84,26 @@ router.post('/articles/:article_id/comments/new', (request, response) => {
         .then((id) => response.send({ comment_id: id }))
         .catch((error) => response.status(500).send(error));
     }
+});
+
+router.get('/articles/:article_id/comments', (request, response) => {
+  const article_id = Number(request.params.article_id);
+  wikiService
+    .getComments(article_id)
+    .then((rows) => {
+      response.send(rows);
+    })
+    .catch((error) => response.status(500).send(error));
+});
+router.delete('/articles/:article_id/comments/:comment_id', (request, response) => {
+  const comment_id = Number(request.params.comment_id);
+  wikiService.deleteComment(comment_id).then();
+});
+router.put('/articles/:article_id/comments/:comment_id', (request, response) => {
+  const data = request.body;
+  console.log(data);
+  if (data.comment.content) wikiService.editComment(data.comment);
+  console.log('from router');
 });
 
 router.delete('/articles/delete/:article_id', (request, response) => {
