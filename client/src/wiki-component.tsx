@@ -33,6 +33,11 @@ type Comment = {
   content: string;
 };
 
+type Tag = {
+  id: number;
+  tag: string;
+};
+
 export class ArticleDetails extends Component<{
   match: { params: { article_id: number; version_number?: number } };
 }> {
@@ -46,6 +51,7 @@ export class ArticleDetails extends Component<{
   };
   views: number = 0;
   content_formatted: HTMLDivElement | null = null;
+  comments: Comment[] = [];
 
   render() {
     return (
@@ -77,6 +83,40 @@ export class ArticleDetails extends Component<{
         >
           Edit
         </Button.Success>
+        <Card title="Comments">
+          <Row>
+            <Column>comment:</Column>
+            <Column>Added by:</Column>
+            <Column>Edit:</Column>
+            <Column>Delete:</Column>
+          </Row>
+          {this.comments.map((comment, i) => (
+            <Row key={i}>
+              <Column>{comment.content}</Column>
+              <Column>{comment.user}</Column>
+              <Column>
+                <Button.Light
+                  onClick={() => {
+                    const newContent = String(prompt('Write your comment:'));
+                    comment.content = newContent;
+                    wikiService.editComment(comment);
+                  }}
+                >
+                  Edit
+                </Button.Light>
+              </Column>
+              <Column>
+                <Button.Danger
+                  onClick={() => {
+                    wikiService.deleteComment(comment);
+                  }}
+                >
+                  X
+                </Button.Danger>
+              </Column>
+            </Row>
+          ))}
+        </Card>
         <CommentCreate article_id={this.props.match.params.article_id} />
         <VersionHistory article_id={this.props.match.params.article_id} />
       </>
@@ -106,6 +146,10 @@ export class ArticleDetails extends Component<{
         .then((response) => (this.views = response.views))
         .catch((error) => Alert.danger('Error getting article: ' + error.message));
     }
+    wikiService
+      .getComments(this.props.match.params.article_id)
+      .then((comments) => (this.comments = comments))
+      .catch((error) => Alert.danger('Error getting comments: ' + error.message));
   }
 }
 
@@ -474,5 +518,75 @@ export class Login extends Component {
         <h1>Log in</h1>
       </div>
     );
+  }
+}
+
+export class TagList extends Component {
+  tags: Tag[] = [];
+  checked: number[] = [];
+
+  render() {
+    return (
+      <div>
+        <Card title="Tags">
+          <Row>
+            {this.tags.map((tag) => (
+              <Column key={tag.id} width={1}>
+                <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                  <Form.Checkbox
+                    onChange={() => {
+                      this.checkBoxUpdate(tag.id);
+                    }}
+                    checked={this.checked.includes(tag.id)}
+                    style={{ display: 'none' }}
+                  ></Form.Checkbox>
+                  <span
+                    onClick={() => this.checkBoxUpdate(tag.id)}
+                    style={{
+                      display: 'inline-block',
+                      border: '2px solid black',
+                      padding: '4px 2px',
+                      backgroundColor: this.checked.includes(tag.id)
+                        ? 'rgb(0, 0, 0)'
+                        : 'transparent',
+                      cursor: 'pointer',
+                      color: this.checked.includes(tag.id) ? 'white' : 'black',
+                    }}
+                  >
+                    {tag.tag}
+                  </span>
+                </div>
+              </Column>
+            ))}
+          </Row>
+          <Row>
+            <Column width={1}>
+              <Button.Success
+                onClick={() => {
+                  console.log(this.checked);
+                }}
+              >
+                Test
+              </Button.Success>
+            </Column>
+          </Row>
+        </Card>
+      </div>
+    );
+  }
+
+  mounted() {
+    wikiService
+      .getTags()
+      .then((tags) => (this.tags = tags))
+      .catch((error) => Alert.danger('Error getting Tags: ' + error.message));
+  }
+
+  checkBoxUpdate(id: number) {
+    if (this.checked.includes(id)) {
+      this.checked = this.checked.filter((e) => e !== id);
+    } else {
+      this.checked.push(id);
+    }
   }
 }

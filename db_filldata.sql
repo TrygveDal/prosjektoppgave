@@ -1,4 +1,5 @@
 
+
 INSERT INTO `Articles`(`views`) VALUES (0), (0), (0), (0), (0);
 INSERT INTO `Versions`(`article_id`, `title`, `content`, `author`, `version_type`, `edit_time`, `is_newest_version`) VALUES 
 (1, "Artikkel 1", "Denne artikkelen inneholder informasjon om temaet til artikkel 1", "Svein Rør", "created", 1, 1), 
@@ -7,3 +8,8 @@ INSERT INTO `Versions`(`article_id`, `title`, `content`, `author`, `version_type
 (4, "Artikkel 4", "Denne artikkelen inneholder informasjon om temaet til artikkel 4", "Ruben", "created", 1, 1), 
 (5, "Artikkel 5", "Denne artikkelen inneholder informasjon om temaet til artikkel 5", "Kari", "created", 1, 1);
 
+//Tags
+INSERT INTO `Tags`(id, tag) VALUES
+(1, '2024'),
+(2, 'Sommer'),
+(3, 'Vitenskap');
