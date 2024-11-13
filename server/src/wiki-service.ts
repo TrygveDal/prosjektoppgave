@@ -34,7 +34,7 @@ class WikiService {
   getArticles() {
     return new Promise<Article[]>((resolve, reject) => {
       pool.query(
-        'SELECT * FROM Articles, Versions WHERE Articles.id = Versions.article_id AND is_newest_version = 1',
+        'SELECT author, title, content, `edit_time`, article_id FROM Articles, Versions WHERE Articles.id = Versions.article_id AND is_newest_version = 1',
         (error, results: RowDataPacket[]) => {
           if (error) return reject(error);
 
