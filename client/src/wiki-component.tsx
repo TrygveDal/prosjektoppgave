@@ -166,18 +166,6 @@ export class ArticleList extends Component<{ match: { params: { search_query?: s
   }
 }
 
-export class FormattedContent extends Component<{ content: string }> {
-  temp: HTMLDivElement = document.createElement('div');
-
-  render() {
-    return <></>;
-  }
-  mounted() {
-    this.temp.innerHTML = this.props.content;
-    console.log(this.temp);
-  }
-}
-
 export class VersionHistory extends Component<{ article_id: number }> {
   versions: Version[] = [];
 
