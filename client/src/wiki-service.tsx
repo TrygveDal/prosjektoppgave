@@ -88,7 +88,7 @@ class WikiService {
   deleteComment(comment: Comment) {
     return axios
       .delete('/articles/' + comment.article_id + '/comments/' + comment.comment_id)
-      .then();
+      .then((response) => response.data);
   }
   editComment(comment: Comment) {
     return axios
