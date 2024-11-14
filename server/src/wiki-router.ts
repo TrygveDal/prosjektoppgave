@@ -117,7 +117,7 @@ router.delete('/articles/delete/:article_id', (request, response) => {
   const article_id = Number(request.params.article_id);
   wikiService
     .deleteArticle(article_id)
-    .then(() => response.send())
+    .then((message) => response.send(message))
     .catch((error) => response.status(500).send(error));
 });
 

@@ -6,6 +6,14 @@ import { Alert, Card, Row, Column, Button, Form } from './widgets';
 import { NavLink } from 'react-router-dom';
 import wikiService from './wiki-service';
 import { createHashHistory } from 'history';
+import {
+  FacebookShareButton,
+  FacebookIcon,
+  WhatsappShareButton,
+  WhatsappIcon,
+  TwitterShareButton,
+  TwitterIcon,
+} from 'react-share';
 
 const history = createHashHistory(); // Use history.push(...) to programmatically change path, for instance after successfully saving a student
 
@@ -52,8 +60,15 @@ export class ArticleDetails extends Component<{
   views: number = 0;
   content_formatted: HTMLDivElement | null = null;
   comments: Comment[] = [];
+  comment: Comment = {
+    comment_id: 0,
+    article_id: 0,
+    user: '',
+    content: '',
+  };
 
   render() {
+    const shareUrl = 'localhost:3000/#/articles/this.props.match.params.article_id';
     return (
       <>
         <Card title={this.article.title}>
@@ -81,8 +96,19 @@ export class ArticleDetails extends Component<{
         <Button.Success
           onClick={() => history.push('/articles/' + this.props.match.params.article_id + '/edit')}
         >
-          Edit
+          Edit article
         </Button.Success>
+        <h6>Share article: </h6>
+        <FacebookShareButton url={shareUrl}>
+          <FacebookIcon size={30} round={true} />
+        </FacebookShareButton>
+        <WhatsappShareButton url={shareUrl}>
+          <WhatsappIcon size={30} round={true} />
+        </WhatsappShareButton>
+        <TwitterShareButton url={shareUrl}>
+          <TwitterIcon size={30} round={true} />
+        </TwitterShareButton>
+        <div></div>
         <Card title="Comments">
           <Row>
             <Column>comment:</Column>
@@ -108,7 +134,10 @@ export class ArticleDetails extends Component<{
               <Column>
                 <Button.Danger
                   onClick={() => {
-                    wikiService.deleteComment(comment);
+                    wikiService.deleteComment(comment).then((message) => {
+                      alert(message);
+                      this.mounted();
+                    });
                   }}
                 >
                   X
@@ -117,7 +146,40 @@ export class ArticleDetails extends Component<{
             </Row>
           ))}
         </Card>
-        <CommentCreate article_id={this.props.match.params.article_id} />
+        <Card title="">
+          <Row>
+            <Column width={2}>
+              <Form.Label>Comment</Form.Label>
+            </Column>
+            <Column>
+              <Form.Textarea
+                type="text"
+                value={this.comment.content}
+                onChange={(event) => {
+                  this.comment.content = event.currentTarget.value;
+                }}
+                rows={2}
+              ></Form.Textarea>
+            </Column>
+          </Row>
+        </Card>
+        <Button.Success
+          onClick={() => {
+            const user = String(prompt('Username:'));
+            this.comment.user = user;
+            this.comment.article_id = this.article.article_id;
+            wikiService
+              .addComment(this.comment)
+              .then((comment_id: number) => {
+                history.push(
+                  '/articles/' + this.props.match.params.article_id + '/comments/' + comment_id,
+                );
+              })
+              .catch((error) => Alert.danger('Error adding comment: ' + error.message));
+          }}
+        >
+          Add comment
+        </Button.Success>
         <VersionHistory article_id={this.props.match.params.article_id} />
       </>
     );
@@ -433,44 +495,6 @@ export class ArticleEdit extends Component<{ match: { params: { article_id: numb
       .getArticle(this.props.match.params.article_id)
       .then((article) => (this.article = article))
       .catch((error) => Alert.danger('Error getting article: ' + error.message));
-  }
-}
-
-export class CommentCreate extends Component<{ article_id: number }> {
-  comment: Comment = {
-    comment_id: 0,
-    article_id: 0,
-    user: '',
-    content: '',
-  };
-
-  render() {
-    return (
-      <div style={{ width: 70 + '%' }}>
-        <Card title="Comment:">
-          <Form.Textarea
-            type="text"
-            value={this.comment.content}
-            onChange={(event) => {
-              this.comment.content = event.currentTarget.value;
-            }}
-            rows={3}
-          ></Form.Textarea>
-        </Card>
-        <Button.Success
-          onClick={() => {
-            const user = String(prompt('Username:'));
-            this.comment.user = user;
-            this.comment.article_id = this.props.article_id;
-            wikiService
-              .addComment(this.comment)
-              .catch((error) => Alert.danger('Error adding comment: ' + error.message));
-          }}
-        >
-          Add comment
-        </Button.Success>
-      </div>
-    );
   }
 }
 
