@@ -123,9 +123,12 @@ export class ArticleDetails extends Component<{
               <Column>
                 <Button.Light
                   onClick={() => {
-                    const newContent = String(prompt('Write your comment:'));
-                    comment.content = newContent;
-                    wikiService.editComment(comment);
+                    const newContent = String(prompt('Write your comment:', comment.content));
+
+                    if (comment.content != null) {
+                      comment.content = newContent;
+                      wikiService.editComment(comment);
+                    }
                   }}
                 >
                   Edit
@@ -165,15 +168,13 @@ export class ArticleDetails extends Component<{
         </Card>
         <Button.Success
           onClick={() => {
-            const user = String(prompt('Username:'));
+            const user = String(prompt('Username:', 'anonymous user'));
             this.comment.user = user;
             this.comment.article_id = this.article.article_id;
             wikiService
               .addComment(this.comment)
-              .then((comment_id: number) => {
-                history.push(
-                  '/articles/' + this.props.match.params.article_id + '/comments/' + comment_id,
-                );
+              .then(() => {
+                this.mounted();
               })
               .catch((error) => Alert.danger('Error adding comment: ' + error.message));
           }}
@@ -380,7 +381,7 @@ export class ArticleCreate extends Component {
         </Card>
         <Button.Success
           onClick={() => {
-            const user = String(prompt('Username:'));
+            const user = String(prompt('Username:', 'anonymous user'));
             this.article.author = user;
             wikiService
               .createArticle(this.article)
@@ -408,11 +409,11 @@ export class ArticleEdit extends Component<{ match: { params: { article_id: numb
   onSelectHyperlink = (article_id: number) => {
     if (article_id && article_id != 0) {
       this.article.content +=
-        '<HyperlinkArticle article_id=' +
+        '<a href="/#/articles/' +
         article_id +
-        ' text=' +
+        '">' +
         prompt('text to display as hyperlink: ') +
-        ' />';
+        '</a>';
     }
     this.query = '';
   };
@@ -466,7 +467,7 @@ export class ArticleEdit extends Component<{ match: { params: { article_id: numb
         </Card>
         <Button.Success
           onClick={() => {
-            const user = String(prompt('Username:'));
+            const user = String(prompt('Username:', 'anonymous user'));
             this.article.author = user;
             wikiService
               .createArticle(this.article)
