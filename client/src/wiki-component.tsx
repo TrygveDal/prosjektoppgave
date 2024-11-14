@@ -123,9 +123,8 @@ export class ArticleDetails extends Component<{
               <Column>
                 <Button.Light
                   onClick={() => {
-                    const newContent = String(prompt('Write your comment:', comment.content));
-
-                    if (comment.content != null) {
+                    const newContent = prompt('Write your comment:', comment.content);
+                    if (newContent != null && newContent != '') {
                       comment.content = newContent;
                       wikiService.editComment(comment);
                     }
@@ -168,7 +167,7 @@ export class ArticleDetails extends Component<{
         </Card>
         <Button.Success
           onClick={() => {
-            const user = String(prompt('Username:', 'anonymous user'));
+            const user = String(prompt('Username:'));
             this.comment.user = user;
             this.comment.article_id = this.article.article_id;
             wikiService
@@ -381,7 +380,7 @@ export class ArticleCreate extends Component {
         </Card>
         <Button.Success
           onClick={() => {
-            const user = String(prompt('Username:', 'anonymous user'));
+            const user = String(prompt('Username:'));
             this.article.author = user;
             wikiService
               .createArticle(this.article)
@@ -467,7 +466,7 @@ export class ArticleEdit extends Component<{ match: { params: { article_id: numb
         </Card>
         <Button.Success
           onClick={() => {
-            const user = String(prompt('Username:', 'anonymous user'));
+            const user = String(prompt('Username:'));
             this.article.author = user;
             wikiService
               .createArticle(this.article)
