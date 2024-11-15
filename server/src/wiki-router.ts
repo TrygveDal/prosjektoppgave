@@ -111,4 +111,14 @@ router.get('/tags/:tag_id/count', (request, response) => {
     .catch((error) => response.status(500).send(error));
 });
 
+router.get('/tags/search/:query', (request, response) => {
+  const tag_idList = request.params.query;
+  if (JSON.parse(tag_idList).length != 0) {
+    wikiService
+      .searchTag(tag_idList)
+      .then((data) => response.send(data))
+      .catch((error) => response.status(500).send(error));
+  } else response.status(400).send('No tag selected');
+});
+
 export default router;

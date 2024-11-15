@@ -422,7 +422,7 @@ export class TagList extends Component {
             <Column width={1}>
               <Button.Success
                 onClick={() => {
-                  console.log(this.checked);
+                  this.tagSearch(this.checked);
                 }}
               >
                 Test
@@ -455,5 +455,12 @@ export class TagList extends Component {
     } else {
       this.checked.push(id);
     }
+  }
+
+  tagSearch(tags: number[]) {
+    wikiService.searchTag(tags).then((out) =>
+      // Må legge til visning av sider
+      console.log(out),
+    );
   }
 }

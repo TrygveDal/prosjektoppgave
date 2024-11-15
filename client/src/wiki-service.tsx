@@ -102,6 +102,12 @@ class WikiService {
       .get<{ tag_count: number }>('/tags/' + tag_id + '/count')
       .then((response) => response.data);
   }
+
+  searchTag(tag_idList: number[]) {
+    const query = JSON.stringify(tag_idList);
+
+    return axios.get<string>('/tags/search/' + query).then((response) => response.data);
+  }
 }
 
 const wikiService = new WikiService();
