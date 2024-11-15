@@ -1,9 +1,19 @@
 import * as React from 'react';
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
 import { Component } from 'react-simplified';
 import { Alert, Card, Row, Column, Button, Form } from './widgets';
-import { NavLink, useParams } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import wikiService from './wiki-service';
 import { createHashHistory } from 'history';
+import {
+  FacebookShareButton,
+  FacebookIcon,
+  WhatsappShareButton,
+  WhatsappIcon,
+  TwitterShareButton,
+  TwitterIcon,
+} from 'react-share';
 
 const history = createHashHistory(); // Use history.push(...) to programmatically change path, for instance after successfully saving a student
 
@@ -48,8 +58,17 @@ export class ArticleDetails extends Component<{
     version_number: 0,
   };
   views: number = 0;
+  content_formatted: HTMLDivElement | null = null;
+  comments: Comment[] = [];
+  comment: Comment = {
+    comment_id: 0,
+    article_id: 0,
+    user: '',
+    content: '',
+  };
 
   render() {
+    const shareUrl = 'localhost:3000/#/articles/this.props.match.params.article_id';
     return (
       <>
         <Card title={this.article.title}>
@@ -69,15 +88,98 @@ export class ArticleDetails extends Component<{
             <></>
           )}
           <Row>
-            <Card title="">{this.article.content}</Card>
+            <Card title="">
+              <div ref={(e) => (this.content_formatted = e)}></div>
+            </Card>
           </Row>
         </Card>
         <Button.Success
           onClick={() => history.push('/articles/' + this.props.match.params.article_id + '/edit')}
         >
-          Edit
+          Edit article
         </Button.Success>
-        <CommentCreate article_id={this.props.match.params.article_id} />
+        <h6>Share article: </h6>
+        <FacebookShareButton url={shareUrl}>
+          <FacebookIcon size={30} round={true} />
+        </FacebookShareButton>
+        <WhatsappShareButton url={shareUrl}>
+          <WhatsappIcon size={30} round={true} />
+        </WhatsappShareButton>
+        <TwitterShareButton url={shareUrl}>
+          <TwitterIcon size={30} round={true} />
+        </TwitterShareButton>
+        <div></div>
+        <Card title="Comments">
+          <Row>
+            <Column>comment:</Column>
+            <Column>Added by:</Column>
+            <Column>Edit:</Column>
+            <Column>Delete:</Column>
+          </Row>
+          {this.comments.map((comment, i) => (
+            <Row key={i}>
+              <Column>{comment.content}</Column>
+              <Column>{comment.user}</Column>
+              <Column>
+                <Button.Light
+                  onClick={() => {
+                    const newContent = prompt('Write your comment:', comment.content);
+                    if (newContent != null && newContent != '') {
+                      comment.content = newContent;
+                      wikiService.editComment(comment);
+                    }
+                  }}
+                >
+                  Edit
+                </Button.Light>
+              </Column>
+              <Column>
+                <Button.Danger
+                  onClick={() => {
+                    wikiService.deleteComment(comment).then((message) => {
+                      alert(message);
+                      this.mounted();
+                    });
+                  }}
+                >
+                  X
+                </Button.Danger>
+              </Column>
+            </Row>
+          ))}
+        </Card>
+        <Card title="">
+          <Row>
+            <Column width={2}>
+              <Form.Label>Comment</Form.Label>
+            </Column>
+            <Column>
+              <Form.Textarea
+                type="text"
+                value={this.comment.content}
+                onChange={(event) => {
+                  this.comment.content = event.currentTarget.value;
+                }}
+                rows={2}
+              ></Form.Textarea>
+            </Column>
+          </Row>
+        </Card>
+        <Button.Success
+          onClick={() => {
+            const user = String(prompt('Username:'));
+            this.comment.user = user;
+            this.comment.article_id = this.article.article_id;
+            wikiService
+              .addComment(this.comment)
+              .then(() => {
+                this.mounted();
+              })
+              .catch((error) => Alert.danger('Error adding comment: ' + error.message));
+          }}
+        >
+          Add comment
+        </Button.Success>
         <VersionHistory article_id={this.props.match.params.article_id} />
       </>
     );
@@ -88,6 +190,9 @@ export class ArticleDetails extends Component<{
       wikiService
         .getVersion(this.props.match.params.article_id, this.props.match.params.version_number)
         .then((article) => (this.article = article))
+        .then((article) => {
+          if (this.content_formatted != null) this.content_formatted.innerHTML = article.content;
+        })
         .then(() => wikiService.getViews(this.article.article_id))
         .then((response) => (this.views = response.views))
         .catch((error) => Alert.danger('Error getting article: ' + error.message));
@@ -95,11 +200,18 @@ export class ArticleDetails extends Component<{
       wikiService
         .getArticle(this.props.match.params.article_id)
         .then((article) => (this.article = article))
+        .then((article) => {
+          if (this.content_formatted != null) this.content_formatted.innerHTML = article.content;
+        })
         .then(() => wikiService.viewArticle(this.article.article_id))
         .then(() => wikiService.getViews(this.article.article_id))
         .then((response) => (this.views = response.views))
         .catch((error) => Alert.danger('Error getting article: ' + error.message));
     }
+    wikiService
+      .getComments(this.props.match.params.article_id)
+      .then((comments) => (this.comments = comments))
+      .catch((error) => Alert.danger('Error getting comments: ' + error.message));
   }
 }
 
@@ -207,6 +319,19 @@ export class ArticleCreate extends Component {
     edit_time: 0,
     version_number: 0,
   };
+  onSelectHyperlink = (article_id: number) => {
+    if (article_id && article_id != 0) {
+      this.article.content +=
+        '<a href="/#/articles/' +
+        article_id +
+        '">' +
+        prompt('text to display as hyperlink: ') +
+        '</a>';
+    }
+    this.query = '';
+  };
+
+  query: string = '';
 
   render() {
     return (
@@ -237,6 +362,20 @@ export class ArticleCreate extends Component {
                 rows={10}
               />
             </Column>
+            <Column>
+              <Popup trigger={<button> Link to article</button>}>
+                <Form.Input
+                  type="text"
+                  value={this.query}
+                  onChange={(event) => (this.query = event.currentTarget.value)}
+                />
+                {this.query && this.query.length > 0 ? (
+                  <SearchList search_query={this.query} handleSelect={this.onSelectHyperlink} />
+                ) : (
+                  <></>
+                )}
+              </Popup>
+            </Column>
           </Row>
         </Card>
         <Button.Success
@@ -266,6 +405,20 @@ export class ArticleEdit extends Component<{ match: { params: { article_id: numb
     version_number: 0,
   };
 
+  onSelectHyperlink = (article_id: number) => {
+    if (article_id && article_id != 0) {
+      this.article.content +=
+        '<a href="/#/articles/' +
+        article_id +
+        '">' +
+        prompt('text to display as hyperlink: ') +
+        '</a>';
+    }
+    this.query = '';
+  };
+
+  query: string = '';
+
   render() {
     return (
       <>
@@ -294,6 +447,20 @@ export class ArticleEdit extends Component<{ match: { params: { article_id: numb
                 }}
                 rows={10}
               />
+            </Column>
+            <Column>
+              <Popup trigger={<button> Link to article</button>}>
+                <Form.Input
+                  type="text"
+                  value={this.query}
+                  onChange={(event) => (this.query = event.currentTarget.value)}
+                />
+                {this.query && this.query.length > 0 ? (
+                  <SearchList search_query={this.query} handleSelect={this.onSelectHyperlink} />
+                ) : (
+                  <></>
+                )}
+              </Popup>
             </Column>
           </Row>
         </Card>
@@ -331,41 +498,40 @@ export class ArticleEdit extends Component<{ match: { params: { article_id: numb
   }
 }
 
-export class CommentCreate extends Component<{ article_id: number }> {
-  comment: Comment = {
-    comment_id: 0,
-    article_id: 0,
-    user: '',
-    content: '',
-  };
+export class SearchList extends Component<{
+  search_query: string;
+  handleSelect: (article_id: number) => void;
+}> {
+  articles: { article_id: number; title: string }[] = [];
 
   render() {
     return (
-      <div style={{ width: 70 + '%' }}>
-        <Card title="Comment:">
-          <Form.Textarea
-            type="text"
-            value={this.comment.content}
-            onChange={(event) => {
-              this.comment.content = event.currentTarget.value;
-            }}
-            rows={3}
-          ></Form.Textarea>
-        </Card>
-        <Button.Success
-          onClick={() => {
-            const user = String(prompt('Username:'));
-            this.comment.user = user;
-            this.comment.article_id = this.props.article_id;
-            wikiService
-              .addComment(this.comment)
-              .catch((error) => Alert.danger('Error adding comment: ' + error.message));
-          }}
-        >
-          Add comment
-        </Button.Success>
-      </div>
+      <>
+        {this.articles.length > 0 ? (
+          <>
+            {this.articles.map((article) => (
+              <Button.Light
+                onClick={() => this.props.handleSelect(article.article_id)}
+                key={article.article_id}
+              >
+                {article.title}
+              </Button.Light>
+            ))}
+          </>
+        ) : (
+          <></>
+        )}
+      </>
     );
+  }
+
+  mounted() {
+    wikiService
+      .searchTitles(this.props.search_query)
+      .then((articles) => {
+        this.articles = articles;
+      })
+      .catch((error) => Alert.danger('Error getting articles: ' + error.message));
   }
 }
 

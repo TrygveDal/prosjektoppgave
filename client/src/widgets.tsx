@@ -77,7 +77,7 @@ export class NavPageHeader extends Component {
               </li>
               <li className="nav-item hyperlinks">
                 <div className="nav-link nav-custom-button" aria-current="page">
-                  <NavBar.Link to="/">Login</NavBar.Link>
+                  <NavBar.Link to="/login">Login</NavBar.Link>
                 </div>
               </li>
             </ul>
