@@ -96,6 +96,12 @@ class WikiService {
   getTags() {
     return axios.get<Tag[]>('/tags').then((response) => response.data);
   }
+
+  getTagCount(tag_id: number) {
+    return axios
+      .get<{ tag_count: number }>('/tags/' + tag_id + '/count')
+      .then((response) => response.data);
+  }
 }
 
 const wikiService = new WikiService();

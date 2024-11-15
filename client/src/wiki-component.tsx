@@ -382,6 +382,7 @@ export class Login extends Component {
 export class TagList extends Component {
   tags: Tag[] = [];
   checked: number[] = [];
+  articleCount: { [tagId: number]: number } = {};
 
   render() {
     return (
@@ -411,7 +412,7 @@ export class TagList extends Component {
                       color: this.checked.includes(tag.id) ? 'white' : 'black',
                     }}
                   >
-                    {tag.tag}
+                    {tag.tag} ({this.articleCount[tag.id] || 0})
                   </span>
                 </div>
               </Column>
@@ -436,7 +437,15 @@ export class TagList extends Component {
   mounted() {
     wikiService
       .getTags()
-      .then((tags) => (this.tags = tags))
+      .then((tags) => {
+        this.tags = tags;
+
+        this.tags.forEach((tag) => {
+          wikiService.getTagCount(tag.id).then((count) => {
+            this.articleCount[tag.id] = count.tag_count;
+          });
+        });
+      })
       .catch((error) => Alert.danger('Error getting Tags: ' + error.message));
   }
 
