@@ -129,4 +129,13 @@ router.get('/tags', (_request, response) => {
     .catch((error) => response.status(500).send(error));
 });
 
+router.get('/tags/:tag_id/count', (request, response) => {
+  const tag_id = Number(request.params.tag_id);
+
+  wikiService
+    .getTagCount(tag_id)
+    .then((count) => response.send({ tag_count: count }))
+    .catch((error) => response.status(500).send(error));
+});
+
 export default router;

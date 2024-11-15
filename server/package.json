@@ -18,6 +18,7 @@
     "axios": "^1.7.5",
     "express": "^4.19.2",
     "mysql2": "^3.11.0",
+    "whiteboard-server": "file:",
     "ws": "^8.18.0"
   },
   "devDependencies": {

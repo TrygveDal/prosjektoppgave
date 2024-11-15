@@ -296,6 +296,20 @@ class WikiService {
       });
     });
   }
+
+  getTagCount(tag_id: number) {
+    return new Promise<number>((resolve, reject) => {
+      pool.query(
+        'SELECT COUNT(*) AS count FROM Articles_Tags WHERE tag_id=?',
+        [tag_id],
+        (error, results: RowDataPacket[]) => {
+          if (error) return reject(error);
+
+          resolve(results[0].count as number);
+        },
+      );
+    });
+  }
 }
 
 const wikiService = new WikiService();

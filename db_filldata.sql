@@ -13,3 +13,11 @@ INSERT INTO `Tags`(id, tag) VALUES
 (1, '2024'),
 (2, 'Sommer'),
 (3, 'Vitenskap');
+
+
+INSERT INTO Articles_Tags (tag_id, article_id) VALUES 
+(1, 3),
+(1, 2),
+(2, 4),
+(3, 1);
+
