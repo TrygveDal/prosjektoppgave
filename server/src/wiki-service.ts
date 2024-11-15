@@ -282,6 +282,13 @@ class WikiService {
           if (error) return reject(error);
         },
       );
+      pool.query(
+        'DELETE FROM `Article_Tags` WHERE `Article_Tags`.`article_id` = ?;',
+        [article_id],
+        (error, results: ResultSetHeader[]) => {
+          if (error) return reject(error);
+        },
+      );
       resolve();
     });
   }
