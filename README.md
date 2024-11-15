@@ -27,7 +27,7 @@ CREATE TABLE `Versions` (
   `content` TEXT NOT NULL ,
   `author` TEXT NOT NULL,
   `version_type` TEXT NOT NULL ,
-  `version_number` INT NOT NULL,
+  `version_number` INT NOT NULL DEFAULT '1',
   `edit_time` BIGINT NOT NULL,
   `is_newest_version` BOOL NOT NULL
 );
@@ -67,6 +67,8 @@ cd server
 npm install
 npm start
 ```
+
+"# webTechnologyProject" "# WebProject" "# WebProject"
 
 ### Run server tests:
 

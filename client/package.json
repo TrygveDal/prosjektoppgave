@@ -22,7 +22,9 @@
   "dependencies": {
     "axios": "^1.7.5",
     "react-router-dom-v5-compat": "^6.26.1",
+    "react-share": "^5.1.1",
     "react-simplified": "^4.0.3",
+    "reactjs-popup": "^2.0.6",
     "whiteboard-client": "file:"
   },
   "devDependencies": {

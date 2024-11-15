@@ -42,6 +42,11 @@ class WikiService {
   searchArticles(query: string) {
     return axios.get<Article[]>('/articles/search/' + query).then((response) => response.data);
   }
+  searchTitles(query: string) {
+    return axios
+      .get<{ article_id: number; title: string }[]>('/search/titles/' + query)
+      .then((response) => response.data);
+  }
 
   getArticle(article_id: number) {
     return axios.get<Article>('/articles/' + article_id).then((response) => response.data);
@@ -65,6 +70,34 @@ class WikiService {
       .then((response) => response.data);
   }
 
+  // Add comment:
+  addComment(comment: Comment) {
+    return axios
+      .post<{
+        comment_id: number;
+      }>('/articles/' + comment.article_id + '/comments/new', { comment })
+      .then((Response) => Response.data.comment_id);
+  }
+
+  // get comments:
+  getComments(article_id: number) {
+    return axios
+      .get<Comment[]>('/articles/' + article_id + '/comments')
+      .then((response) => response.data);
+  }
+  deleteComment(comment: Comment) {
+    return axios
+      .delete('/articles/' + comment.article_id + '/comments/' + comment.comment_id)
+      .then((response) => response.data);
+  }
+  editComment(comment: Comment) {
+    return axios
+      .put('/articles/' + comment.article_id + '/comments/' + comment.comment_id, {
+        comment,
+      })
+      .then(() => {});
+  }
+
   versionHistory(article_id: number) {
     return axios
       .get<Version[]>('/articles/' + article_id + '/versionhistory')
@@ -77,15 +110,6 @@ class WikiService {
     return axios
       .post<{ article_id: number }>('/articles', { article })
       .then((response) => response.data.article_id);
-  }
-
-  // Add comment:
-  addComment(comment: Comment) {
-    return axios
-      .post<{
-        comment_id: number;
-      }>('/articles/' + comment.article_id + '/comments/new', { comment })
-      .then((Response) => Response.data.comment_id);
   }
 
   deleteArticle(article_id: number) {
