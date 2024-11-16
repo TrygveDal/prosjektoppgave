@@ -167,15 +167,18 @@ export class ArticleDetails extends Component<{
         </Card>
         <Button.Success
           onClick={() => {
-            const user = String(prompt('Username:'));
-            this.comment.user = user;
-            this.comment.article_id = this.article.article_id;
-            wikiService
-              .addComment(this.comment)
-              .then(() => {
-                this.mounted();
-              })
-              .catch((error) => Alert.danger('Error adding comment: ' + error.message));
+            const user = prompt('Username:');
+            if (user && user != null && user.length > 0) {
+              this.comment.user = user;
+              this.comment.article_id = this.article.article_id;
+              wikiService
+                .addComment(this.comment)
+                .then(() => {
+                  this.comment.content = '';
+                  this.mounted();
+                })
+                .catch((error) => Alert.danger('Error adding comment: ' + error.message));
+            }
           }}
         >
           Add comment
@@ -331,6 +334,9 @@ export class ArticleCreate extends Component {
     this.query = '';
   };
 
+  tags: Tag[] = [];
+  checked: number[] = [];
+
   query: string = '';
 
   render() {
@@ -376,6 +382,36 @@ export class ArticleCreate extends Component {
                 )}
               </Popup>
             </Column>
+            <Column>
+              <Card title="Tags">
+                {this.tags.map((tag) => (
+                  <Row key={tag.id}>
+                    <Form.Checkbox
+                      onChange={() => {
+                        this.checkBoxUpdate(tag.id);
+                      }}
+                      checked={this.checked.includes(tag.id)}
+                      style={{ display: 'none' }}
+                    ></Form.Checkbox>
+                    <span
+                      onClick={() => this.checkBoxUpdate(tag.id)}
+                      style={{
+                        display: 'inline-block',
+                        border: '2px solid black',
+                        padding: '4px 2px',
+                        backgroundColor: this.checked.includes(tag.id)
+                          ? 'rgb(0, 0, 0)'
+                          : 'transparent',
+                        cursor: 'pointer',
+                        color: this.checked.includes(tag.id) ? 'white' : 'black',
+                      }}
+                    >
+                      {tag.tag}
+                    </span>
+                  </Row>
+                ))}
+              </Card>
+            </Column>
           </Row>
         </Card>
         <Button.Success
@@ -384,6 +420,12 @@ export class ArticleCreate extends Component {
             this.article.author = user;
             wikiService
               .createArticle(this.article)
+              .then((article_id) => {
+                if (this.checked.length > 0) {
+                  let article_tags = { article_id: article_id, tag_ids: this.checked };
+                  wikiService.addArticleTags(article_tags);
+                }
+              })
               .then(() => history.push('/'))
               .catch((error) => Alert.danger('Error creating article: ' + error.message));
           }}
@@ -392,6 +434,23 @@ export class ArticleCreate extends Component {
         </Button.Success>
       </>
     );
+  }
+
+  mounted() {
+    wikiService
+      .getTags()
+      .then((tags) => {
+        this.tags = tags;
+      })
+      .catch((error) => Alert.danger('Error getting Tags: ' + error.message));
+  }
+
+  checkBoxUpdate(id: number) {
+    if (this.checked.includes(id)) {
+      this.checked = this.checked.filter((e) => e !== id);
+    } else {
+      this.checked.push(id);
+    }
   }
 }
 
@@ -480,7 +539,10 @@ export class ArticleEdit extends Component<{ match: { params: { article_id: numb
           onClick={() =>
             wikiService
               .deleteArticle(this.article.article_id)
-              .then(() => history.push('/'))
+              .then(() => {
+                Alert.success('Successfully deleted article');
+                history.push('/');
+              })
               .catch((error) => Alert.danger('Error deleting article: ' + error.message))
           }
         >
