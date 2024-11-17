@@ -46,6 +46,7 @@ class WikiService {
   searchArticles(query: string) {
     return new Promise<Article[]>((resolve, reject) => {
       const _query = '%' + query.toLowerCase() + '%';
+
       pool.query(
         'SELECT author, title, content, `edit_time`, article_id FROM Articles, Versions WHERE Articles.id = Versions.article_id AND is_newest_version = 1 AND (LOWER(content) LIKE ? OR LOWER(title) LIKE ?)',
         [_query, _query],
@@ -326,6 +327,21 @@ class WikiService {
 
         resolve();
       });
+    });
+  }
+  searchTag(query: string) {
+    return new Promise<string>((resolve, reject) => {
+      const _query = JSON.parse(query);
+
+      pool.query(
+        'SELECT article_id FROM Articles_Tags WHERE tag_id IN (?) GROUP BY article_id HAVING COUNT(DISTINCT tag_id) >=?',
+        [_query, _query.length],
+        (error, results: RowDataPacket[]) => {
+          if (error) return reject(error);
+
+          resolve(JSON.stringify(results));
+        },
+      );
     });
   }
 }

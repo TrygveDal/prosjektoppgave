@@ -26,64 +26,81 @@ export class NavPageHeader extends Component {
   query: string = '';
   render() {
     return (
-      <nav className="navbar navbar-expand-lg bg-body-tertiary navbar-light">
-        <div className="container-fluid">
-          <a className="navbar-brand" href="" style={{ width: '', height: '' }}>
-            <img src={'../assets/pictures/logo.png'} />
+      <div>
+        <div className="row">
+          <a href="" className="d-flex justify-content-center">
+            <img
+              src={'../assets/pictures/logo.png'}
+              style={{ height: '10rem', width: 'fit-content' }}
+            />
           </a>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarNav"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-
-          <div className="collapse navbar-collapse">
-            <ul className="navbar-nav">
-              <li className="nav-item searchbox">
-                <form className="d-flex nav-link" role="search">
-                  <input
-                    className="form-control me-2 search-input"
-                    type="search"
-                    placeholder="Search"
-                    aria-label="Search"
-                    value={this.query}
-                    onChange={(event) => {
-                      this.query = event.currentTarget.value;
-                    }}
-                  />
-                  <NavLink
-                    style={{ color: 'inherit', textDecoration: 'inherit' }}
-                    to={'/articles/search/' + this.query}
-                  >
-                    <button className="btn btn-outline-success search-btn" type="submit">
-                      Search
-                    </button>
-                  </NavLink>
-                </form>
-              </li>
-              <li className="nav-item hyperlinks">
-                <div className="nav-link nav-custom-button" aria-current="page">
-                  <NavBar.Link to="/articles/new">Create new page</NavBar.Link>
-                </div>
-              </li>
-              <li className="nav-item hyperlinks">
-                <div className="nav-link nav-custom-button" aria-current="page">
-                  <NavBar.Link to="/tags">Tags</NavBar.Link>
-                </div>
-              </li>
-              <li className="nav-item hyperlinks">
-                <div className="nav-link nav-custom-button" aria-current="page">
-                  <NavBar.Link to="/login">Login</NavBar.Link>
-                </div>
-              </li>
-            </ul>
-          </div>
         </div>
-      </nav>
+        <div className="container-fluid text-center border border-2">
+          <nav className="navbar navbar-expand-lg bg-body-tertiary navbar-light">
+            <button
+              className="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent"
+              aria-expanded="false"
+            >
+              <span className="navbar-toggler-icon"></span>
+            </button>
+
+            <div className="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul className="navbar-nav container-fluid">
+                <div className="col container-fluid">
+                  <li className="nav-item searchbox ">
+                    <form className="d-flex nav-link" role="search">
+                      <input
+                        className="form-control me-2 search-input"
+                        type="search"
+                        placeholder="Search"
+                        aria-label="Search"
+                        value={this.query}
+                        onChange={(event) => {
+                          this.query = event.currentTarget.value;
+                        }}
+                      />
+                      <NavLink
+                        style={{ color: 'inherit', textDecoration: 'inherit' }}
+                        to={'/articles/search/' + this.query}
+                      >
+                        <button className="btn btn-outline-success search-btn" type="submit">
+                          Search
+                        </button>
+                      </NavLink>
+                    </form>
+                  </li>
+                </div>
+                <div className="col container-fluid">
+                  <li className="nav-item">
+                    <div className="nav-link nav-custom-button" aria-current="page">
+                      <NavBar.Link to="/articles/new">Create new page</NavBar.Link>
+                    </div>
+                  </li>
+                </div>
+                <div className="col">
+                  <li className="nav-item">
+                    <div className="nav-link nav-custom-button" aria-current="page">
+                      <NavBar.Link to="/tags">Tags</NavBar.Link>
+                    </div>
+                  </li>
+                </div>
+
+                <div className="col">
+                  <li className="nav-item">
+                    <div className="nav-link nav-custom-button" aria-current="page">
+                      <NavBar.Link to="/login">Login</NavBar.Link>
+                    </div>
+                  </li>
+                </div>
+              </ul>
+            </div>
+          </nav>
+        </div>
+      </div>
     );
   }
 }

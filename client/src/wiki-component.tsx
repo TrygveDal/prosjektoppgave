@@ -611,6 +611,7 @@ export class TagList extends Component {
   tags: Tag[] = [];
   checked: number[] = [];
   articleCount: { [tagId: number]: number } = {};
+  articles: Article[] = [];
 
   render() {
     return (
@@ -650,13 +651,41 @@ export class TagList extends Component {
             <Column width={1}>
               <Button.Success
                 onClick={() => {
-                  console.log(this.checked);
+                  this.tagSearch(this.checked);
                 }}
               >
-                Test
+                Search
               </Button.Success>
             </Column>
           </Row>
+        </Card>
+        <Card title="Articles">
+          {this.articles.length > 0 ? (
+            <>
+              <Row>
+                <Column>Article</Column>
+                <Column>Last edited by</Column>
+                <Column>Last edit at</Column>
+              </Row>
+              {this.articles.map((article, i) => (
+                <Row key={i}>
+                  <Column>
+                    <NavLink
+                      to={'/articles/' + article.article_id}
+                      style={{ color: 'inherit', textDecoration: 'inherit' }}
+                    >
+                      {article.title}
+                    </NavLink>
+                  </Column>
+
+                  <Column>{article.author}</Column>
+                  <Column>{new Date(article.edit_time).toLocaleString()}</Column>
+                </Row>
+              ))}
+            </>
+          ) : (
+            <div>No articles found</div>
+          )}
         </Card>
       </div>
     );
@@ -683,5 +712,17 @@ export class TagList extends Component {
     } else {
       this.checked.push(id);
     }
+  }
+
+  tagSearch(tags: number[]) {
+    wikiService.searchTag(tags).then((out) => {
+      if (this.articles.length !== 0) this.articles = [];
+
+      out.forEach((e) => {
+        wikiService.getArticle(e.article_id).then((response) => {
+          this.articles.push(response);
+        });
+      });
+    });
   }
 }
