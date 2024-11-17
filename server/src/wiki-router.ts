@@ -84,6 +84,7 @@ router.post('/articles', (request, response) => {
 
 router.post('/articles/:article_id/comments/new', (request, response) => {
   const data = request.body;
+  console.log(data);
   if (data.comment && data.comment.content && data.comment.user && data.comment.article_id)
     if (data.comment.article_id != 0) {
       wikiService
