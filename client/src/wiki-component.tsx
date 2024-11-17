@@ -660,32 +660,32 @@ export class TagList extends Component {
           </Row>
         </Card>
         <Card title="Articles">
-          {/* {this.articles.length > 0 ? ( */}
-          <>
-            <Row>
-              <Column>Article</Column>
-              <Column>Last edited by</Column>
-              <Column>Last edit at</Column>
-            </Row>
-            {this.articles.map((article, i) => (
-              <Row key={i}>
-                <Column>
-                  <NavLink
-                    to={'/articles/' + article.article_id}
-                    style={{ color: 'inherit', textDecoration: 'inherit' }}
-                  >
-                    {article.title}
-                  </NavLink>
-                </Column>
-
-                <Column>{article.author}</Column>
-                <Column>{new Date(article.edit_time).toLocaleString()}</Column>
+          {this.articles.length > 0 ? (
+            <>
+              <Row>
+                <Column>Article</Column>
+                <Column>Last edited by</Column>
+                <Column>Last edit at</Column>
               </Row>
-            ))}
-          </>
-          {/* ) : (
+              {this.articles.map((article, i) => (
+                <Row key={i}>
+                  <Column>
+                    <NavLink
+                      to={'/articles/' + article.article_id}
+                      style={{ color: 'inherit', textDecoration: 'inherit' }}
+                    >
+                      {article.title}
+                    </NavLink>
+                  </Column>
+
+                  <Column>{article.author}</Column>
+                  <Column>{new Date(article.edit_time).toLocaleString()}</Column>
+                </Row>
+              ))}
+            </>
+          ) : (
             <div>No articles found</div>
-          )} */}
+          )}
         </Card>
       </div>
     );
