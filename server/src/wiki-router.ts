@@ -161,5 +161,23 @@ router.get('/tags/search/:query', (request, response) => {
       .catch((error) => response.status(500).send(error));
   } else response.status(400).send('No tag selected');
 });
+router.post('/tags/new', (request, response) => {
+  const data = request.body;
+  if (data.tag_name && data.tag_name != '') {
+    wikiService
+      .createTag(data.tag_name)
+      .then(() => response.send())
+      .catch((error) => response.status(500).send(error.message));
+  } else response.status(400).send('Missing name');
+});
+router.delete('/tags/delete/:tag_id', (request, response) => {
+  const tag_id = Number(request.params.tag_id);
+  if (tag_id && tag_id != 0) {
+    wikiService
+      .deleteTag(tag_id)
+      .then(() => response.send())
+      .catch((error) => response.status(500).send(error.message));
+  } else response.status(400).send('invalid tag');
+});
 
 export default router;

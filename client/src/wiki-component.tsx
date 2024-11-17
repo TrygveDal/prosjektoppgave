@@ -657,6 +657,40 @@ export class TagList extends Component {
                 Search
               </Button.Success>
             </Column>
+            <Column width={1}>
+              <Popup
+                trigger={
+                  <button
+                    style={{
+                      display: 'inline-block',
+                      border: '2px solid black',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    New tag
+                  </button>
+                }
+              >
+                <TagCreate />
+              </Popup>
+            </Column>
+            <Column width={1}>
+              <Popup
+                trigger={
+                  <button
+                    style={{
+                      display: 'inline-block',
+                      border: '2px solid black',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Delete tag
+                  </button>
+                }
+              >
+                <TagDelete />
+              </Popup>
+            </Column>
           </Row>
         </Card>
         <Card title="Articles">
@@ -724,5 +758,68 @@ export class TagList extends Component {
         });
       });
     });
+  }
+}
+export class TagCreate extends Component {
+  tag: string = '';
+  render() {
+    return (
+      <>
+        <Card title="New tag">
+          <Row>
+            <Column>
+              <Form.Input
+                type="text"
+                value={this.tag}
+                onChange={(event) => (this.tag = event.currentTarget.value)}
+              />
+            </Column>
+          </Row>
+        </Card>
+        <Button.Success
+          onClick={() => {
+            wikiService
+              .createTag(this.tag)
+              .then(() => window.location.reload())
+              .catch((error) => Alert.danger('Error creating tag: ' + error.message));
+          }}
+        >
+          Create
+        </Button.Success>
+      </>
+    );
+  }
+}
+
+export class TagDelete extends Component {
+  tags: Tag[] = [];
+
+  render() {
+    return (
+      <>
+        {this.tags.map((tag) => (
+          <Row key={tag.id}>
+            <Button.Light
+              onClick={() => {
+                wikiService
+                  .deleteTag(tag.id)
+                  .then(() => {
+                    window.location.reload();
+                  })
+                  .catch((error) => Alert.danger('Error deleting tag: ' + error.message));
+              }}
+            >
+              {tag.tag}
+            </Button.Light>
+          </Row>
+        ))}
+      </>
+    );
+  }
+  mounted() {
+    wikiService
+      .getTags()
+      .then((tags) => (this.tags = tags))
+      .catch((error) => Alert.danger('Error getting Tags: ' + error.message));
   }
 }

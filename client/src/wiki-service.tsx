@@ -136,6 +136,14 @@ class WikiService {
 
     return axios.get<any[]>('/tags/search/' + query).then((response) => response.data);
   }
+
+  createTag(tag_name: string) {
+    return axios.post('/tags/new', { tag_name }).then((response) => response.data);
+  }
+
+  deleteTag(tag_id: number) {
+    return axios.delete('/tags/delete/' + tag_id).then((response) => response.data);
+  }
 }
 
 const wikiService = new WikiService();
