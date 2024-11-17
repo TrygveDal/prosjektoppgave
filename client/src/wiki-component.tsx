@@ -59,13 +59,6 @@ export class ArticleDetails extends Component<{
   };
   views: number = 0;
   content_formatted: HTMLDivElement | null = null;
-  comments: Comment[] = [];
-  comment: Comment = {
-    comment_id: 0,
-    article_id: 0,
-    user: '',
-    content: '',
-  };
 
   render() {
     const shareUrl = 'localhost:3000/#/articles/this.props.match.params.article_id';
@@ -109,80 +102,7 @@ export class ArticleDetails extends Component<{
           <TwitterIcon size={30} round={true} />
         </TwitterShareButton>
         <div></div>
-        <Card title="Comments">
-          <Row>
-            <Column>comment:</Column>
-            <Column>Added by:</Column>
-            <Column>Edit:</Column>
-            <Column>Delete:</Column>
-          </Row>
-          {this.comments.map((comment, i) => (
-            <Row key={i}>
-              <Column>{comment.content}</Column>
-              <Column>{comment.user}</Column>
-              <Column>
-                <Button.Light
-                  onClick={() => {
-                    const newContent = prompt('Write your comment:', comment.content);
-                    if (newContent != null && newContent != '') {
-                      comment.content = newContent;
-                      wikiService.editComment(comment);
-                    }
-                  }}
-                >
-                  Edit
-                </Button.Light>
-              </Column>
-              <Column>
-                <Button.Danger
-                  onClick={() => {
-                    wikiService.deleteComment(comment).then((message) => {
-                      alert(message);
-                      this.mounted();
-                    });
-                  }}
-                >
-                  X
-                </Button.Danger>
-              </Column>
-            </Row>
-          ))}
-        </Card>
-        <Card title="">
-          <Row>
-            <Column width={2}>
-              <Form.Label>Comment</Form.Label>
-            </Column>
-            <Column>
-              <Form.Textarea
-                type="text"
-                value={this.comment.content}
-                onChange={(event) => {
-                  this.comment.content = event.currentTarget.value;
-                }}
-                rows={2}
-              ></Form.Textarea>
-            </Column>
-          </Row>
-        </Card>
-        <Button.Success
-          onClick={() => {
-            const user = prompt('Username:');
-            if (user && user != null && user.length > 0) {
-              this.comment.user = user;
-              this.comment.article_id = this.article.article_id;
-              wikiService
-                .addComment(this.comment)
-                .then(() => {
-                  this.comment.content = '';
-                  this.mounted();
-                })
-                .catch((error) => Alert.danger('Error adding comment: ' + error.message));
-            }
-          }}
-        >
-          Add comment
-        </Button.Success>
+        <Comments article_id={this.article.article_id} />
         <VersionHistory article_id={this.props.match.params.article_id} />
       </>
     );
@@ -211,10 +131,6 @@ export class ArticleDetails extends Component<{
         .then((response) => (this.views = response.views))
         .catch((error) => Alert.danger('Error getting article: ' + error.message));
     }
-    wikiService
-      .getComments(this.props.match.params.article_id)
-      .then((comments) => (this.comments = comments))
-      .catch((error) => Alert.danger('Error getting comments: ' + error.message));
   }
 }
 
@@ -369,7 +285,7 @@ export class ArticleCreate extends Component {
               />
             </Column>
             <Column>
-              <Popup trigger={<button> Link to article</button>}>
+              <Popup trigger={<button>Link to article</button>}>
                 <Form.Input
                   type="text"
                   value={this.query}
@@ -451,6 +367,101 @@ export class ArticleCreate extends Component {
     } else {
       this.checked.push(id);
     }
+  }
+}
+export class Comments extends Component<{ article_id: number }> {
+  comments: Comment[] = [];
+  comment: Comment = {
+    comment_id: 0,
+    article_id: 0,
+    user: '',
+    content: '',
+  };
+  render() {
+    return (
+      <>
+        <Card title="Comments">
+          <Row>
+            <Column>comment:</Column>
+            <Column>Added by:</Column>
+            <Column>Edit:</Column>
+            <Column>Delete:</Column>
+          </Row>
+          {this.comments.map((comment, i) => (
+            <Row key={i}>
+              <Column>{comment.content}</Column>
+              <Column>{comment.user}</Column>
+              <Column>
+                <Button.Light
+                  onClick={() => {
+                    const newContent = prompt('Write your comment:', comment.content);
+                    if (newContent != null && newContent != '') {
+                      comment.content = newContent;
+                      wikiService.editComment(comment);
+                    }
+                  }}
+                >
+                  Edit
+                </Button.Light>
+              </Column>
+              <Column>
+                <Button.Danger
+                  onClick={() => {
+                    wikiService.deleteComment(comment).then((message) => {
+                      alert(message);
+                      this.mounted();
+                    });
+                  }}
+                >
+                  X
+                </Button.Danger>
+              </Column>
+            </Row>
+          ))}
+        </Card>
+        <Card title="">
+          <Row>
+            <Column width={2}>
+              <Form.Label>Comment</Form.Label>
+            </Column>
+            <Column>
+              <Form.Textarea
+                type="text"
+                value={this.comment.content}
+                onChange={(event) => {
+                  this.comment.content = event.currentTarget.value;
+                }}
+                rows={2}
+              ></Form.Textarea>
+            </Column>
+          </Row>
+        </Card>
+        <Button.Success
+          onClick={() => {
+            const user = prompt('Username:');
+            if (user && user != null && user.length > 0) {
+              this.comment.user = user;
+              this.comment.article_id = this.props.article_id;
+              wikiService
+                .addComment(this.comment)
+                .then(() => {
+                  this.comment.content = '';
+                  this.mounted();
+                })
+                .catch((error) => Alert.danger('Error adding comment: ' + error.message));
+            }
+          }}
+        >
+          Add comment
+        </Button.Success>
+      </>
+    );
+  }
+  mounted() {
+    wikiService
+      .getComments(this.props.article_id)
+      .then((comments) => (this.comments = comments))
+      .catch((error) => Alert.danger('Error getting comments: ' + error.message));
   }
 }
 
