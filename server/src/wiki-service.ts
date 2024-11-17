@@ -155,14 +155,14 @@ class WikiService {
         );
       });
       article_id
-        .then((id) => {
+        .then((article_id) => {
           pool.query(
             'INSERT INTO `Versions` (`author`,`content`,`edit_time`,`is_newest_version`,`article_id`,`title`,`version_type`,`version_number`) VALUES (?,?,?,1,?,?,"created",1)',
-            [article.author, article.content, article.edit_time, id, article.title],
+            [article.author, article.content, article.edit_time, article_id, article.title],
             (error, results: ResultSetHeader) => {
               if (error) return reject(error);
 
-              resolve(id);
+              resolve(article_id);
             },
           );
         })
@@ -262,24 +262,27 @@ class WikiService {
 
   deleteArticle(article_id: number) {
     return new Promise<void>((resolve, reject) => {
-      pool.query(
-        'DELETE FROM `Articles` WHERE `id`= ?;',
-        [article_id],
-        (error, results: ResultSetHeader[]) => {
-          if (error) return reject(error);
-        },
-      );
+      pool.query('DELETE FROM `Articles` WHERE `id`= ?;', [article_id], (error, results) => {
+        if (error) return reject(error);
+      });
       pool.query(
         'DELETE FROM `Versions` WHERE `Versions`.`article_id` = ?;',
         [article_id],
-        (error, results: ResultSetHeader[]) => {
+        (error, results) => {
           if (error) return reject(error);
         },
       );
       pool.query(
         'DELETE FROM `Comments` WHERE `Comments`.`article_id` = ?;',
         [article_id],
-        (error, results: ResultSetHeader[]) => {
+        (error, results) => {
+          if (error) return reject(error);
+        },
+      );
+      pool.query(
+        'DELETE FROM `Articles_Tags` WHERE `Articles_Tags`.`article_id` = ?;',
+        [article_id],
+        (error, results) => {
           if (error) return reject(error);
         },
       );
@@ -325,6 +328,20 @@ class WikiService {
           resolve(JSON.stringify(results));
         },
       );
+    });
+  }
+  addArticleTag(article_id: number, tag_ids: number[]) {
+    return new Promise<void>((resolve, reject) => {
+      let query: string = 'INSERT INTO `Articles_Tags`(`tag_id`,`article_id`) VALUES ';
+      for (let i = 0; i < tag_ids.length; i++) {
+        query += '(' + tag_ids[i] + ',' + article_id + '),';
+      }
+      query = query.slice(0, -1);
+      pool.query(query, (error, results) => {
+        if (error) return reject(error);
+
+        resolve();
+      });
     });
   }
 }

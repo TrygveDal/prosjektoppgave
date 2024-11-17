@@ -71,12 +71,12 @@ router.post('/articles', (request, response) => {
     if (data.article.article_id && data.article.article_id != 0) {
       wikiService
         .editArticle(data.article)
-        .then((id) => response.send({ id: id }))
+        .then((article_id) => response.send({ article_id: article_id }))
         .catch((error) => response.status(500).send(error));
     } else {
       wikiService
         .createArticle(data.article)
-        .then((id) => response.send({ id: id }))
+        .then((article_id) => response.send({ article_id: article_id }))
         .catch((error) => response.status(500).send(error));
     }
   else response.status(400).send('Missing data');
@@ -146,6 +146,21 @@ router.get('/tags/search/:query', (request, response) => {
       .then((data) => response.send(data))
       .catch((error) => response.status(500).send(error));
   } else response.status(400).send('No tag selected');
+});
+
+router.post('/articles/tags', (request, response) => {
+  const data = request.body;
+  if (
+    data.article_tags.article_id &&
+    data.article_tags.tag_ids &&
+    data.article_tags.article_id != 0 &&
+    data.article_tags.tag_ids.length != 0
+  ) {
+    wikiService
+      .addArticleTag(data.article_tags.article_id, data.article_tags.tag_ids)
+      .then(() => response.send())
+      .catch((error) => response.status(500).send(error.message));
+  } else response.status(400).send('Missing data');
 });
 
 export default router;

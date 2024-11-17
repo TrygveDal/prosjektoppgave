@@ -132,6 +132,10 @@ class WikiService {
 
     return axios.get<any[]>('/tags/search/' + query).then((response) => response.data);
   }
+
+  addArticleTags(article_tags: { article_id: number; tag_ids: number[] }) {
+    return axios.post('/articles/tags', { article_tags }).then((response) => response.data);
+  }
 }
 
 const wikiService = new WikiService();
