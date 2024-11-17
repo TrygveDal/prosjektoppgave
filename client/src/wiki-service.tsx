@@ -130,7 +130,7 @@ class WikiService {
   searchTag(tag_idList: number[]) {
     const query = JSON.stringify(tag_idList);
 
-    return axios.get<string>('/tags/search/' + query).then((response) => response.data);
+    return axios.get<any[]>('/tags/search/' + query).then((response) => response.data);
   }
 }
 
