@@ -654,7 +654,7 @@ export class TagList extends Component {
                   this.tagSearch(this.checked);
                 }}
               >
-                Test
+                Search
               </Button.Success>
             </Column>
           </Row>
