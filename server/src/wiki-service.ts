@@ -63,7 +63,7 @@ class WikiService {
       const _query = '%' + query.toLowerCase() + '%';
       pool.query(
         'SELECT title, article_id FROM Versions WHERE is_newest_version = 1 AND LOWER(title) LIKE ?',
-        [_query, _query],
+        [_query],
         (error, results: RowDataPacket[]) => {
           if (error) return reject(error);
 
@@ -327,6 +327,34 @@ class WikiService {
 
         resolve();
       });
+    });
+  }
+  createTag(tag_name: string) {
+    return new Promise<void>((resolve, reject) => {
+      pool.query(
+        'INSERT INTO `Tags`(`tag`) VALUES (?)',
+        [tag_name],
+        (error, results: ResultSetHeader) => {
+          if (error) return reject(error);
+
+          resolve();
+        },
+      );
+    });
+  }
+  deleteTag(tag_id: number) {
+    return new Promise<void>((resolve, reject) => {
+      pool.query('DELETE FROM `Tags` WHERE `id`= ?;', [tag_id], (error, results) => {
+        if (error) return reject(error);
+      });
+      pool.query(
+        'DELETE FROM `Articles_Tags` WHERE `Articles_Tags`.`tag_id` = ?;',
+        [tag_id],
+        (error, results) => {
+          if (error) return reject(error);
+        },
+      );
+      resolve();
     });
   }
   searchTag(query: string) {
