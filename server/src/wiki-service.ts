@@ -315,6 +315,20 @@ class WikiService {
     });
   }
 
+  addArticleTag(article_id: number, tag_ids: number[]) {
+    return new Promise<void>((resolve, reject) => {
+      let query: string = 'INSERT INTO `Articles_Tags`(`tag_id`,`article_id`) VALUES ';
+      for (let i = 0; i < tag_ids.length; i++) {
+        query += '(' + tag_ids[i] + ',' + article_id + '),';
+      }
+      query = query.slice(0, -1);
+      pool.query(query, (error, results) => {
+        if (error) return reject(error);
+
+        resolve();
+      });
+    });
+  }
   searchTag(query: string) {
     return new Promise<string>((resolve, reject) => {
       const _query = JSON.parse(query);
@@ -328,20 +342,6 @@ class WikiService {
           resolve(JSON.stringify(results));
         },
       );
-    });
-  }
-  addArticleTag(article_id: number, tag_ids: number[]) {
-    return new Promise<void>((resolve, reject) => {
-      let query: string = 'INSERT INTO `Articles_Tags`(`tag_id`,`article_id`) VALUES ';
-      for (let i = 0; i < tag_ids.length; i++) {
-        query += '(' + tag_ids[i] + ',' + article_id + '),';
-      }
-      query = query.slice(0, -1);
-      pool.query(query, (error, results) => {
-        if (error) return reject(error);
-
-        resolve();
-      });
     });
   }
 }
