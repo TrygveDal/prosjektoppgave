@@ -24,7 +24,7 @@ Comments: Enable users to add, edit, and delete comments on pages.
 
 ## Getting Started
 
-Create tables.
+Create tables. The file db_filldata.sql contains datarows for the various tables below
 
 ```sql
 CREATE TABLE `Versions` (
