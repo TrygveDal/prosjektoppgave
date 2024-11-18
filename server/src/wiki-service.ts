@@ -218,6 +218,7 @@ class WikiService {
         'INSERT INTO `Comments` (`article_id`,`user`,`content`) VALUES (?,?,?);',
         [comment.article_id, comment.user, comment.content],
         (error, results: ResultSetHeader) => {
+          console.log(results);
           if (error) return reject(error);
           // returns the id of the new comment
           resolve(results.insertId as number);

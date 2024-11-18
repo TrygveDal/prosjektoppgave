@@ -1,5 +1,8 @@
 body {
+  overflow-x: hidden;
   font-family: 'Nunito Sans', sans-serif;
+  margin-left: 1vh;
+  margin-right: 1vh;
   background-color: #fff;
 }
 .navbar-brand img {

@@ -2,7 +2,7 @@ import * as React from 'react';
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import { Component } from 'react-simplified';
-import { Alert, Card, Row, Column, Button, Form } from './widgets';
+import { Alert, Card, Row, Column, Button, Form, CommentWidget } from './widgets';
 import { NavLink } from 'react-router-dom';
 import wikiService from './wiki-service';
 import { createHashHistory } from 'history';
@@ -143,26 +143,32 @@ export class ArticleList extends Component<{ match: { params: { search_query?: s
         <Card title="Articles">
           {this.articles.length > 0 ? (
             <>
-              <Row>
-                <Column>Article</Column>
-                <Column>Last edited by</Column>
-                <Column>Last edit at</Column>
-              </Row>
-              {this.articles.map((article, i) => (
-                <Row key={i}>
-                  <Column>
-                    <NavLink
-                      to={'/articles/' + article.article_id}
-                      style={{ color: 'inherit', textDecoration: 'inherit' }}
-                    >
-                      {article.title}
-                    </NavLink>
-                  </Column>
-
-                  <Column>{article.author}</Column>
-                  <Column>{new Date(article.edit_time).toLocaleString()}</Column>
-                </Row>
-              ))}
+              <table className="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Article</th>
+                    <th>Last edited by</th>
+                    <th>Last edit at</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {this.articles.map((article, i) => (
+                    <tr key={i}>
+                      <td>
+                        <nav className="stroke">
+                          {' '}
+                          <a href={`#/articles/${article.article_id}`} className="nav-link">
+                            {article.title}
+                          </a>
+                    
+                        </nav>
+                      </td>
+                      <td>{article.author}</td>
+                      <td>{new Date(article.edit_time).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </>
           ) : (
             <div>No articles found</div>
@@ -381,79 +387,79 @@ export class Comments extends Component<{ article_id: number }> {
     return (
       <>
         <Card title="Comments">
-          <Row>
-            <Column>comment:</Column>
-            <Column>Added by:</Column>
-            <Column>Edit:</Column>
-            <Column>Delete:</Column>
-          </Row>
           {this.comments.map((comment, i) => (
             <Row key={i}>
-              <Column>{comment.content}</Column>
-              <Column>{comment.user}</Column>
-              <Column>
-                <Button.Light
-                  onClick={() => {
-                    const newContent = prompt('Write your comment:', comment.content);
-                    if (newContent != null && newContent != '') {
-                      comment.content = newContent;
-                      wikiService.editComment(comment);
-                    }
-                  }}
-                >
-                  Edit
-                </Button.Light>
-              </Column>
-              <Column>
-                <Button.Danger
-                  onClick={() => {
-                    wikiService.deleteComment(comment).then((message) => {
-                      alert(message);
-                      this.mounted();
-                    });
-                  }}
-                >
-                  X
-                </Button.Danger>
-              </Column>
+              <CommentWidget
+                comment={comment.content}
+                addedBy={comment.user}
+                edit_onClick={() => {
+                  const newContent = prompt('Write your comment:', comment.content);
+                  if (newContent != null && newContent != '') {
+                    comment.content = newContent;
+                    wikiService.editComment(comment);
+                  }
+                }}
+                delete_onClick={() => {
+                  wikiService.deleteComment(comment).then((message) => {
+                    alert(message);
+                    this.mounted();
+                  });
+                }}
+              ></CommentWidget>
             </Row>
           ))}
         </Card>
-        <Card title="">
-          <Row>
-            <Column width={2}>
-              <Form.Label>Comment</Form.Label>
-            </Column>
-            <Column>
-              <Form.Textarea
-                type="text"
-                value={this.comment.content}
+
+        <form className="needs-validation" id="customValidateClass" noValidate>
+          <Card title="">
+            <div>
+              <label htmlFor="validate01">Textarea</label>
+              <textarea
+                className="form-control"
+                id="validate01"
                 onChange={(event) => {
                   this.comment.content = event.currentTarget.value;
                 }}
-                rows={2}
-              ></Form.Textarea>
-            </Column>
-          </Row>
-        </Card>
-        <Button.Success
-          onClick={() => {
-            const user = prompt('Username:');
-            if (user && user != null && user.length > 0) {
-              this.comment.user = user;
-              this.comment.article_id = this.props.article_id;
-              wikiService
-                .addComment(this.comment)
-                .then(() => {
-                  this.comment.content = '';
-                  this.mounted();
-                })
-                .catch((error) => Alert.danger('Error adding comment: ' + error.message));
-            }
-          }}
-        >
-          Add comment
-        </Button.Success>
+                required
+              ></textarea>
+              <div className="valid-feedback">valid</div>
+              <div className="invalid-feedback">invalid</div>
+            </div>
+            <button
+              className="btn btn-primary"
+              id="leggTilCommentBtn"
+              onClick={() => {
+                'use strict';
+
+                const form: HTMLFormElement = document.getElementById(
+                  'customValidateClass',
+                ) as HTMLFormElement;
+
+                if (!form.checkValidity()) {
+                  form.classList.add('was-validated');
+                  return false;
+                }
+
+                const user = prompt('Username:');
+                if (user && user != null && user.length > 0) {
+                  this.comment.user = user;
+                  this.comment.article_id = this.props.article_id;
+                  console.log(this.comment);
+
+                  wikiService
+                    .addComment(this.comment)
+                    .then(() => {
+                      this.comment.content = '';
+                      this.mounted();
+                    })
+                    .catch((error) => Alert.danger('Error adding comment: ' + error.message));
+                }
+              }}
+            >
+              Post comment
+            </button>
+          </Card>
+        </form>
       </>
     );
   }

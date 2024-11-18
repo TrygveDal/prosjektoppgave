@@ -105,6 +105,42 @@ export class NavPageHeader extends Component {
   }
 }
 
+export class CommentWidget extends Component<{
+  comment: string;
+  addedBy: string;
+  edit_onClick: () => void;
+  delete_onClick: () => void;
+}> {
+  render() {
+    return (
+      <div className="card" style={{ fontSize: '1.2em', width: '40%', marginTop: '20px' }}>
+        <div className="card-body">
+          <div className="card-title">{this.props.comment}</div>
+
+          <div className="d-flex justify-content-between">
+            <div className="small d-flex flex-row align-items-end justify-content-start">
+              <img
+                src="../assets/pictures/person-icon.png"
+                style={{ width: '20px', height: '20px', marginLeft: '4px', marginRight: '4px' }}
+              />
+              {this.props.addedBy}
+            </div>
+
+            <div className="d-flex flex-row justify-content-end">
+              <div style={{ marginLeft: '6px', marginRight: '6px' }}>
+                <Button.Light onClick={this.props.edit_onClick}>EDIT</Button.Light>
+              </div>
+              <div style={{ marginLeft: '6px', marginRight: '6px' }}>
+                <Button.Danger onClick={this.props.delete_onClick}>X</Button.Danger>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
 /**
  * Renders a row using Bootstrap classes.
  */
