@@ -160,7 +160,6 @@ export class ArticleList extends Component<{ match: { params: { search_query?: s
                           <a href={`#/articles/${article.article_id}`} className="nav-link">
                             {article.title}
                           </a>
-                    
                         </nav>
                       </td>
                       <td>{article.author}</td>
@@ -611,16 +610,6 @@ export class SearchList extends Component<{
         this.articles = articles;
       })
       .catch((error) => Alert.danger('Error getting articles: ' + error.message));
-  }
-}
-
-export class Login extends Component {
-  render() {
-    return (
-      <div>
-        <h1>Log in</h1>
-      </div>
-    );
   }
 }
 

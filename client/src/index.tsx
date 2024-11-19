@@ -1,14 +1,7 @@
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import { HashRouter, Route } from 'react-router-dom';
-import {
-  ArticleList,
-  ArticleCreate,
-  ArticleEdit,
-  ArticleDetails,
-  Login,
-  TagList,
-} from './wiki-component';
+import { ArticleList, ArticleCreate, ArticleEdit, ArticleDetails, TagList } from './wiki-component';
 import { Alert, NavPageHeader } from './widgets';
 
 let root = document.getElementById('root');
@@ -28,8 +21,6 @@ if (root)
         />
         <Route exact path="/articles/new" component={ArticleCreate} />
         <Route exact path="/articles/:article_id(\d+)/edit" component={ArticleEdit} />
-        <Route exact path="/login" component={Login} />
-
         <Route exact path="/tags" component={TagList} />
       </>
     </HashRouter>,

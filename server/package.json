@@ -1,11 +1,10 @@
 {
-  "name": "whiteboard-server",
+  "name": "wiki-server",
   "version": "1.0.0",
-  "description": "A simple Whiteboard WebSocket server",
+  "description": "A simple wiki server",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon src/server.ts --exec \"npx babel-node -x .ts --require ./config\"",
-    "test": "jest --setupFiles ./test/config.ts"
+    "start": "nodemon src/server.ts --exec \"npx babel-node -x .ts --require ./config\""
   },
   "browserslist": [
     "maintained node versions"
@@ -17,9 +16,7 @@
   "dependencies": {
     "axios": "^1.7.5",
     "express": "^4.19.2",
-    "mysql2": "^3.11.0",
-    "whiteboard-server": "file:",
-    "ws": "^8.18.0"
+    "mysql2": "^3.11.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
