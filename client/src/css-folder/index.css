@@ -5,9 +5,6 @@ body {
   margin-right: 1vh;
   background-color: #fff;
 }
-.navbar-brand img {
-  border: 5px solid black;
-}
 
 .nav-link {
   color: #000;
@@ -24,6 +21,7 @@ body {
 .search-input:hover,
 .search-input:focus {
   box-shadow: 0 0 0 3px rgba(148, 205, 243, 0.479);
+  /* color: rgb(206, 206, 206); */
 }
 .search-btn {
   transition: 0.2s;
@@ -47,4 +45,15 @@ body {
 .navbar {
   padding-bottom: 1px;
   padding-top: 1px;
+}
+
+#navContainerID {
+  padding-left: 0;
+  padding-right: 0;
+}
+.testststst {
+  border-radius: 10px;
+}
+.testststst:hover {
+  background-color: rgb(220, 220, 220);
 }

@@ -634,80 +634,94 @@ export class TagList extends Component {
     return (
       <div>
         <Card title="Tags">
+          <Card title="">
+            <Row>
+              <div className="d-flex flex-row ">
+                {this.tags.map((tag) => (
+                  <div className="p-2">
+                    <Column key={tag.id} right={false}>
+                      <div className="testststst">
+                        <Form.Checkbox
+                          onChange={() => {
+                            this.checkBoxUpdate(tag.id);
+                          }}
+                          checked={this.checked.includes(tag.id)}
+                          style={{ display: 'none' }}
+                        ></Form.Checkbox>
+                        <span
+                          onClick={() => this.checkBoxUpdate(tag.id)}
+                          style={{
+                            display: 'inline-block',
+
+                            border: this.checked.includes(tag.id)
+                              ? '2px solid blue'
+                              : '2px solid black',
+                            borderRadius: '10px',
+                            padding: '4px 2px',
+                            backgroundColor: this.checked.includes(tag.id)
+                              ? 'rgb(220, 220, 220)'
+                              : 'transparent',
+                            cursor: 'pointer',
+                            color: 'black',
+                          }}
+                        >
+                          {tag.tag} ({this.articleCount[tag.id] || 0})
+                        </span>
+                      </div>
+                    </Column>
+                  </div>
+                ))}
+              </div>
+            </Row>
+          </Card>
           <Row>
-            {this.tags.map((tag) => (
-              <Column key={tag.id} width={1}>
-                <div style={{ display: 'inline-flex', alignItems: 'center' }}>
-                  <Form.Checkbox
-                    onChange={() => {
-                      this.checkBoxUpdate(tag.id);
-                    }}
-                    checked={this.checked.includes(tag.id)}
-                    style={{ display: 'none' }}
-                  ></Form.Checkbox>
-                  <span
-                    onClick={() => this.checkBoxUpdate(tag.id)}
-                    style={{
-                      display: 'inline-block',
-                      border: '2px solid black',
-                      padding: '4px 2px',
-                      backgroundColor: this.checked.includes(tag.id)
-                        ? 'rgb(0, 0, 0)'
-                        : 'transparent',
-                      cursor: 'pointer',
-                      color: this.checked.includes(tag.id) ? 'white' : 'black',
-                    }}
-                  >
-                    {tag.tag} ({this.articleCount[tag.id] || 0})
-                  </span>
-                </div>
-              </Column>
-            ))}
-          </Row>
-          <Row>
-            <Column width={1}>
-              <Button.Success
-                onClick={() => {
-                  this.tagSearch(this.checked);
-                }}
-              >
-                Search
-              </Button.Success>
-            </Column>
-            <Column width={1}>
-              <Popup
-                trigger={
-                  <button
-                    style={{
-                      display: 'inline-block',
-                      border: '2px solid black',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    New tag
-                  </button>
-                }
-              >
-                <TagCreate />
-              </Popup>
-            </Column>
-            <Column width={1}>
-              <Popup
-                trigger={
-                  <button
-                    style={{
-                      display: 'inline-block',
-                      border: '2px solid black',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Delete tag
-                  </button>
-                }
-              >
-                <TagDelete />
-              </Popup>
-            </Column>
+            <div className="d-flex flex-row" style={{ paddingTop: '2px' }}>
+              <div className="p-3">
+                <Button.Success
+                  onClick={() => {
+                    this.tagSearch(this.checked);
+                  }}
+                >
+                  Search
+                </Button.Success>
+              </div>
+              <div className="p-3">
+                <Popup
+                  trigger={
+                    <button
+                      style={{
+                        display: 'inline-block',
+                        border: '2px solid black',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      New tag
+                    </button>
+                  }
+                >
+                  <TagCreate />
+                </Popup>
+              </div>
+              <div className="p-3">
+                <Popup
+                  trigger={
+                    <button
+                      style={{
+                        display: 'inline-block',
+                        border: '2px solid black',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Delete tag
+                    </button>
+                  }
+                >
+                  <TagDelete />
+                </Popup>
+              </div>
+            </div>
           </Row>
         </Card>
         <Card title="Articles">

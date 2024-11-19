@@ -35,7 +35,7 @@ export class NavPageHeader extends Component {
             />
           </a>
         </div>
-        <div className="container-fluid text-center border border-2">
+        <div className="container-fluid text-center border border-2" id="navContainerID">
           <nav className="navbar navbar-expand-lg bg-body-tertiary navbar-light">
             <button
               className="navbar-toggler"
