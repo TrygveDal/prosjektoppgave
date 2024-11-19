@@ -128,5 +128,5 @@ Project Link: https://github.com/TrygveDal/prosjektoppgave
 Resources we would like to give credit to.
 
 - [w3schools](https://www.w3schools.com/js/default.asp)
--
+-[Logo used](https://bloomfire.com/resources/what-is-a-wiki/)
 -
