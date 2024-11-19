@@ -160,8 +160,7 @@ export class ArticleList extends Component<{ match: { params: { search_query?: s
                           <a href={`#/articles/${article.article_id}`} className="nav-link">
                             {article.title}
                           </a>
-                          {/* {' '}
-                          <a href={`#/articles/${article.article_id}`}>{article.title}</a> */}
+                    
                         </nav>
                       </td>
                       <td>{article.author}</td>
