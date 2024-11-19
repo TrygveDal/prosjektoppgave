@@ -416,6 +416,7 @@ export class Comments extends Component<{ article_id: number }> {
               <textarea
                 className="form-control"
                 id="validate01"
+                value={this.comment.content}
                 onChange={(event) => {
                   this.comment.content = event.currentTarget.value;
                 }}
